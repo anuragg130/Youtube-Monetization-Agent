@@ -49,3 +49,21 @@ def days_to_eligibility(
             return None
         days = max(days, math.ceil(needed / rate))
     return days
+
+
+def required_daily_growth(subscribers: int, watch_hours_12m: float, days: int) -> Dict[str, float]:
+    """Return the daily growth needed to meet both YPP thresholds within ``days``.
+
+    The inverse of :func:`days_to_eligibility`. Rates are 0 for thresholds
+    that are already met.
+
+    Raises:
+        ValueError: if ``days`` is not a positive integer.
+    """
+    if days < 1:
+        raise ValueError("days must be at least 1")
+    gap = eligibility_gap(subscribers, watch_hours_12m)
+    return {
+        "subs_per_day": round(gap["subscribers_needed"] / days, 2),
+        "watch_hours_per_day": round(gap["watch_hours_needed"] / days, 2),
+    }

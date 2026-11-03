@@ -30,3 +30,14 @@ def test_days_to_eligibility_edge_cases():
     assert days_to_eligibility(500, 5000, 0, 10) is None
     with pytest.raises(ValueError):
         days_to_eligibility(500, 1000, -1, 10)
+
+
+def test_required_daily_growth():
+    import pytest
+
+    from ytagent.progress import required_daily_growth
+
+    assert required_daily_growth(400, 1000, 30) == {"subs_per_day": 20.0, "watch_hours_per_day": 100.0}
+    assert required_daily_growth(1500, 3990, 7) == {"subs_per_day": 0.0, "watch_hours_per_day": 1.43}
+    with pytest.raises(ValueError):
+        required_daily_growth(400, 1000, 0)
