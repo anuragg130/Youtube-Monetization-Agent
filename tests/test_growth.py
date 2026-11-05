@@ -1,6 +1,6 @@
 import pytest
 
-from ytagent.growth import average_daily_growth, daily_changes, median_daily_growth
+from ytagent.growth import average_daily_growth, daily_changes, median_daily_growth, percent_growth
 
 
 def test_daily_changes():
@@ -16,3 +16,12 @@ def test_average_and_median_growth():
 def test_requires_two_values():
     with pytest.raises(ValueError):
         average_daily_growth([100])
+
+
+def test_percent_growth():
+    assert percent_growth([800, 900, 1000]) == 25.0
+    assert percent_growth([200, 150]) == -25.0
+    with pytest.raises(ValueError):
+        percent_growth([100])
+    with pytest.raises(ValueError):
+        percent_growth([0, 10])
