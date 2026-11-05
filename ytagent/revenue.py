@@ -1,4 +1,5 @@
 """Estimate ad revenue from view counts and RPM (revenue per mille)."""
+import math
 from typing import Dict
 
 
@@ -35,3 +36,19 @@ def revenue_range(monetized_views: int, low_rpm: float, high_rpm: float) -> Dict
         "low": estimate_revenue(monetized_views, low_rpm),
         "high": estimate_revenue(monetized_views, high_rpm),
     }
+
+
+def views_needed_for_revenue(target_revenue: float, rpm: float) -> int:
+    """Return the monetized views needed to earn ``target_revenue`` at ``rpm``.
+
+    The inverse of :func:`estimate_revenue`, rounded up to whole views. For
+    example, earning $500 at a $2.50 RPM needs 200,000 monetized views.
+
+    Raises:
+        ValueError: if the target is negative or ``rpm`` is not positive.
+    """
+    if target_revenue < 0:
+        raise ValueError("target_revenue must be non-negative")
+    if rpm <= 0:
+        raise ValueError("rpm must be positive")
+    return math.ceil(round(target_revenue / rpm * 1000, 6))
