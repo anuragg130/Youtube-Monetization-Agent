@@ -1,6 +1,13 @@
 import pytest
 
-from ytagent.growth import average_daily_growth, daily_changes, median_daily_growth, percent_growth, rolling_average
+from ytagent.growth import (
+    average_daily_growth,
+    daily_changes,
+    median_daily_growth,
+    peak_daily_gain,
+    percent_growth,
+    rolling_average,
+)
 
 
 def test_daily_changes():
@@ -38,3 +45,11 @@ def test_rolling_average_invalid_window():
         rolling_average([1, 2, 3], window=0)
     with pytest.raises(ValueError):
         rolling_average([1, 2, 3], window=4)
+
+
+def test_peak_daily_gain():
+    assert peak_daily_gain([100, 105, 180, 190]) == (2, 75)
+    assert peak_daily_gain([50, 40, 30]) == (1, -10)
+    assert peak_daily_gain([0, 10, 0, 10]) == (1, 10)
+    with pytest.raises(ValueError):
+        peak_daily_gain([100])
