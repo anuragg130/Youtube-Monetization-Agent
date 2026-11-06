@@ -37,3 +37,23 @@ def percent_growth(counts: Sequence[float]) -> float:
     if counts[0] <= 0:
         raise ValueError("first value must be positive")
     return round((counts[-1] - counts[0]) / counts[0] * 100, 2)
+
+
+def rolling_average(counts: Sequence[float], window: int = 7) -> List[float]:
+    """Return the trailing moving average of ``counts`` over ``window`` days.
+
+    Smooths noisy daily totals (e.g. views or new subscribers) so that
+    weekly trends are easier to spot. The result has
+    ``len(counts) - window + 1`` values.
+
+    Raises:
+        ValueError: if ``window`` is not positive or exceeds the series length.
+    """
+    if window < 1:
+        raise ValueError("window must be at least 1")
+    if window > len(counts):
+        raise ValueError("window must not exceed the number of values")
+    return [
+        round(statistics.mean(counts[i : i + window]), 2)
+        for i in range(len(counts) - window + 1)
+    ]

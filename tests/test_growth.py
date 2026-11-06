@@ -1,6 +1,6 @@
 import pytest
 
-from ytagent.growth import average_daily_growth, daily_changes, median_daily_growth, percent_growth
+from ytagent.growth import average_daily_growth, daily_changes, median_daily_growth, percent_growth, rolling_average
 
 
 def test_daily_changes():
@@ -25,3 +25,16 @@ def test_percent_growth():
         percent_growth([100])
     with pytest.raises(ValueError):
         percent_growth([0, 10])
+
+
+def test_rolling_average():
+    assert rolling_average([10, 20, 30, 40], window=2) == [15, 25, 35]
+    assert rolling_average([5, 5, 5], window=3) == [5]
+    assert rolling_average([1, 2], window=1) == [1, 2]
+
+
+def test_rolling_average_invalid_window():
+    with pytest.raises(ValueError):
+        rolling_average([1, 2, 3], window=0)
+    with pytest.raises(ValueError):
+        rolling_average([1, 2, 3], window=4)
