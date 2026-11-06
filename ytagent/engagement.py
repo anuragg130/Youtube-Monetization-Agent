@@ -1,4 +1,5 @@
 """Audience engagement metrics derived from per-video statistics."""
+from typing import Iterable, Mapping
 
 
 def engagement_rate(likes: int, comments: int, views: int) -> float:
@@ -41,3 +42,24 @@ def watch_hours_from_views(views: int, avg_view_duration_minutes: float) -> floa
     if views < 0 or avg_view_duration_minutes < 0:
         raise ValueError("views and avg_view_duration_minutes must be non-negative")
     return round(views * avg_view_duration_minutes / 60, 2)
+
+
+def channel_engagement_rate(videos: Iterable[Mapping[str, int]]) -> float:
+    """Return the view-weighted engagement rate across several videos.
+
+    Each item needs ``likes``, ``comments`` and ``views`` keys. Totals are
+    summed before dividing, so a single low-view video cannot skew the
+    result the way averaging per-video :func:`engagement_rate` values would.
+
+    Raises:
+        KeyError: if a video is missing one of the required keys.
+        ValueError: if any count is negative.
+    """
+    likes = comments = views = 0
+    for video in videos:
+        likes += video["likes"]
+        comments += video["comments"]
+        views += video["views"]
+        if min(video["likes"], video["comments"], video["views"]) < 0:
+            raise ValueError("likes, comments and views must be non-negative")
+    return engagement_rate(likes, comments, views)
