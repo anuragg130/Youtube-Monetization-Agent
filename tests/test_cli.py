@@ -18,3 +18,13 @@ def test_report_handles_stalled_growth():
 def test_main_prints_report(capsys):
     assert main(["900", "4000"]) == 0
     assert "100 needed" in capsys.readouterr().out
+
+
+def test_main_prints_revenue_projection(capsys):
+    assert main(["1500", "4200", "--daily-views", "2000", "--rpm", "3", "--monetized-share", "0.6"]) == 0
+    assert "Projected 30-day revenue: $108.00" in capsys.readouterr().out
+
+
+def test_main_omits_revenue_without_daily_views(capsys):
+    main(["1500", "4200"])
+    assert "Projected" not in capsys.readouterr().out

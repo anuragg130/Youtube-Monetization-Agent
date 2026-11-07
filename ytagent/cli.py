@@ -9,6 +9,7 @@ from typing import List, Optional
 
 from ytagent.eligibility import is_eligible
 from ytagent.progress import days_to_eligibility, eligibility_gap, progress_percent
+from ytagent.revenue import project_monthly_revenue
 
 
 def build_report(subscribers: int, watch_hours: float, subs_per_day: float = 0.0, hours_per_day: float = 0.0) -> str:
@@ -34,8 +35,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("watch_hours", type=float, help="public watch hours in the last 12 months")
     parser.add_argument("--subs-per-day", type=float, default=0.0)
     parser.add_argument("--hours-per-day", type=float, default=0.0)
+    parser.add_argument("--daily-views", type=float, help="average daily views for a revenue projection")
+    parser.add_argument("--rpm", type=float, default=2.0, help="revenue per 1,000 monetized views")
+    parser.add_argument("--monetized-share", type=float, default=1.0)
     args = parser.parse_args(argv)
     print(build_report(args.subscribers, args.watch_hours, args.subs_per_day, args.hours_per_day))
+    if args.daily_views is not None:
+        monthly = project_monthly_revenue(args.daily_views, args.rpm, args.monetized_share)
+        print(f"Projected 30-day revenue: ${monthly:.2f}")
     return 0
 
 
