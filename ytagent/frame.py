@@ -32,3 +32,22 @@ def summarize_daily_frame(df: pd.DataFrame) -> Dict[str, float]:
         "subs_per_day": average_daily_growth(ordered["subscribers"].tolist()),
         "hours_per_day": average_daily_growth(ordered["watch_hours"].tolist()),
     }
+
+
+def add_daily_gains(df: pd.DataFrame) -> pd.DataFrame:
+    """Return a date-sorted copy of ``df`` with per-day gain columns.
+
+    Adds ``new_subscribers`` and ``new_watch_hours`` from the day-over-day
+    difference of the cumulative totals. The first row has no prior day, so
+    its gains are 0. The input DataFrame is not modified.
+
+    Raises:
+        ValueError: if a required column is missing.
+    """
+    missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
+    if missing:
+        raise ValueError(f"missing columns: {', '.join(missing)}")
+    ordered = df.assign(date=pd.to_datetime(df["date"])).sort_values("date").reset_index(drop=True)
+    ordered["new_subscribers"] = ordered["subscribers"].diff().fillna(0).astype(int)
+    ordered["new_watch_hours"] = ordered["watch_hours"].diff().fillna(0.0)
+    return ordered
