@@ -72,3 +72,22 @@ def peak_daily_gain(counts: Sequence[float]) -> Tuple[int, float]:
     changes = daily_changes(counts)
     best = max(range(len(changes)), key=lambda i: changes[i])
     return best + 1, changes[best]
+
+
+def weekly_totals(daily_values: Sequence[float], week_length: int = 7) -> List[float]:
+    """Sum daily values (e.g. new subscribers or views) into consecutive weeks.
+
+    A trailing partial week is included as its own total, so 10 days of data
+    produce two values: days 1-7 and days 8-10.
+
+    Raises:
+        ValueError: if ``daily_values`` is empty or ``week_length`` < 1.
+    """
+    if not daily_values:
+        raise ValueError("daily_values must not be empty")
+    if week_length < 1:
+        raise ValueError("week_length must be at least 1")
+    return [
+        round(sum(daily_values[i : i + week_length]), 2)
+        for i in range(0, len(daily_values), week_length)
+    ]

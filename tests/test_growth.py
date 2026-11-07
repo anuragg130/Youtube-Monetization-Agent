@@ -53,3 +53,20 @@ def test_peak_daily_gain():
     assert peak_daily_gain([0, 10, 0, 10]) == (1, 10)
     with pytest.raises(ValueError):
         peak_daily_gain([100])
+
+
+def test_weekly_totals_includes_partial_week():
+    from ytagent.growth import weekly_totals
+
+    assert weekly_totals([1] * 10) == [7, 3]
+    assert weekly_totals([5, 5, 5, 5], week_length=2) == [10, 10]
+
+
+def test_weekly_totals_rejects_bad_input():
+    import pytest
+    from ytagent.growth import weekly_totals
+
+    with pytest.raises(ValueError):
+        weekly_totals([])
+    with pytest.raises(ValueError):
+        weekly_totals([1, 2], week_length=0)
