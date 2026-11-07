@@ -36,6 +36,27 @@ videos = [
 print(channel_engagement_rate(videos))          # 4.0 (% of views, weighted by views)
 ```
 
+### Forecasting and weekly roll-ups
+
+```python
+from ytagent.growth import weekly_totals
+from ytagent.revenue import project_monthly_revenue
+
+new_subs = [12, 15, 9, 20, 18, 25, 30, 22, 19, 24]
+print(weekly_totals(new_subs))                                # [129, 65] (last week is partial)
+print(project_monthly_revenue(2000, 3.0, monetized_share=0.6))  # 108.0
+```
+
+## Command line
+
+```bash
+python -m ytagent.cli 710 2500 --subs-per-day 22.5 --hours-per-day 40
+# Not yet eligible.
+# Subscribers: 71.0% (290 needed)
+# Watch hours: 62.5% (1500.0 needed)
+# Estimated days: 38
+```
+
 ## Running tests
 
 ```bash
