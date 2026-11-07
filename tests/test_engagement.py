@@ -34,3 +34,12 @@ def test_channel_engagement_rate_validates_input():
         channel_engagement_rate([{"likes": 1, "views": 10}])
     with pytest.raises(ValueError):
         channel_engagement_rate([{"likes": -1, "comments": 0, "views": 10}])
+
+
+def test_channel_engagement_rate_reports_bad_video_index():
+    videos = [
+        {"likes": 10, "comments": 0, "views": 100},
+        {"likes": -1, "comments": 0, "views": 100},
+    ]
+    with pytest.raises(ValueError, match="video 1"):
+        channel_engagement_rate(videos)

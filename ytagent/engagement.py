@@ -56,10 +56,11 @@ def channel_engagement_rate(videos: Iterable[Mapping[str, int]]) -> float:
         ValueError: if any count is negative.
     """
     likes = comments = views = 0
-    for video in videos:
-        likes += video["likes"]
-        comments += video["comments"]
-        views += video["views"]
-        if min(video["likes"], video["comments"], video["views"]) < 0:
-            raise ValueError("likes, comments and views must be non-negative")
+    for index, video in enumerate(videos):
+        counts = (video["likes"], video["comments"], video["views"])
+        if min(counts) < 0:
+            raise ValueError(f"video {index} has a negative count")
+        likes += counts[0]
+        comments += counts[1]
+        views += counts[2]
     return engagement_rate(likes, comments, views)
