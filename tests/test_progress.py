@@ -41,3 +41,13 @@ def test_required_daily_growth():
     assert required_daily_growth(1500, 3990, 7) == {"subs_per_day": 0.0, "watch_hours_per_day": 1.43}
     with pytest.raises(ValueError):
         required_daily_growth(400, 1000, 0)
+
+
+def test_gap_and_progress_reject_negative_metrics():
+    import pytest
+    from ytagent.progress import eligibility_gap, progress_percent
+
+    with pytest.raises(ValueError):
+        eligibility_gap(-1, 100)
+    with pytest.raises(ValueError):
+        progress_percent(100, -5.0)

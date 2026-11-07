@@ -5,8 +5,18 @@ from typing import Dict, Optional
 from ytagent.eligibility import SUBSCRIBER_THRESHOLD, WATCH_HOURS_THRESHOLD
 
 
+def _check_metrics(subscribers: int, watch_hours_12m: float) -> None:
+    if subscribers < 0 or watch_hours_12m < 0:
+        raise ValueError("subscribers and watch hours must be non-negative")
+
+
 def eligibility_gap(subscribers: int, watch_hours_12m: float) -> Dict[str, float]:
-    """Return the subscribers and watch hours still needed (0 when met)."""
+    """Return the subscribers and watch hours still needed (0 when met).
+
+    Raises:
+        ValueError: if either metric is negative.
+    """
+    _check_metrics(subscribers, watch_hours_12m)
     return {
         "subscribers_needed": max(0, SUBSCRIBER_THRESHOLD - subscribers),
         "watch_hours_needed": max(0.0, WATCH_HOURS_THRESHOLD - watch_hours_12m),
@@ -14,7 +24,12 @@ def eligibility_gap(subscribers: int, watch_hours_12m: float) -> Dict[str, float
 
 
 def progress_percent(subscribers: int, watch_hours_12m: float) -> Dict[str, float]:
-    """Return percentage progress toward each threshold, capped at 100."""
+    """Return percentage progress toward each threshold, capped at 100.
+
+    Raises:
+        ValueError: if either metric is negative.
+    """
+    _check_metrics(subscribers, watch_hours_12m)
     return {
         "subscribers": round(min(100.0, subscribers / SUBSCRIBER_THRESHOLD * 100), 1),
         "watch_hours": round(min(100.0, watch_hours_12m / WATCH_HOURS_THRESHOLD * 100), 1),
