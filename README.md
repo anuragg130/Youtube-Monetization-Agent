@@ -47,6 +47,24 @@ print(weekly_totals(new_subs))                                # [129, 65] (last 
 print(project_monthly_revenue(2000, 3.0, monetized_share=0.6))  # 108.0
 ```
 
+### Milestones and analytics exports
+
+```python
+import pandas as pd
+from ytagent.frame import summarize_daily_frame
+from ytagent.milestones import milestone_progress
+
+print(milestone_progress(710))  # (1000, 42.0) -> 42% of the way from 500 to 1,000
+
+df = pd.DataFrame({
+    "date": ["2026-11-01", "2026-11-02", "2026-11-03"],
+    "subscribers": [690, 700, 710],
+    "watch_hours": [2420.0, 2460.0, 2500.0],
+})
+print(summarize_daily_frame(df))
+# {'days': 2, 'subscribers': 710, 'watch_hours': 2500.0, 'subs_per_day': 10, 'hours_per_day': 40.0}
+```
+
 ## Command line
 
 ```bash
@@ -60,6 +78,6 @@ python -m ytagent.cli 710 2500 --subs-per-day 22.5 --hours-per-day 40
 ## Running tests
 
 ```bash
-pip install pytest
+pip install -r requirements.txt
 python -m pytest -q
 ```
