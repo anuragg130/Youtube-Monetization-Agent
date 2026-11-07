@@ -65,6 +65,17 @@ print(summarize_daily_frame(df))
 # {'days': 2, 'subscribers': 710, 'watch_hours': 2500.0, 'subs_per_day': 10, 'hours_per_day': 40.0}
 ```
 
+### Shorts route and daily gains
+
+```python
+from ytagent.frame import add_daily_gains
+from ytagent.shorts import is_shorts_eligible, shorts_gap
+
+print(is_shorts_eligible(1200, 8_000_000))  # False
+print(shorts_gap(1200, 8_000_000))          # {'subscribers_needed': 0, 'shorts_views_needed': 2000000}
+print(add_daily_gains(df)[["date", "new_subscribers", "new_watch_hours"]])
+```
+
 ## Command line
 
 ```bash
@@ -73,6 +84,10 @@ python -m ytagent.cli 710 2500 --subs-per-day 22.5 --hours-per-day 40
 # Subscribers: 71.0% (290 needed)
 # Watch hours: 62.5% (1500.0 needed)
 # Estimated days: 38
+
+python -m ytagent.cli 1500 4200 --daily-views 2000 --rpm 3 --monetized-share 0.6
+# Eligible for the YouTube Partner Program.
+# Projected 30-day revenue: $108.00
 ```
 
 ## Running tests
