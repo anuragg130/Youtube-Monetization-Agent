@@ -52,3 +52,22 @@ def views_needed_for_revenue(target_revenue: float, rpm: float) -> int:
     if rpm <= 0:
         raise ValueError("rpm must be positive")
     return math.ceil(round(target_revenue / rpm * 1000, 6))
+
+
+def project_monthly_revenue(daily_views: float, rpm: float, monetized_share: float = 1.0, days: int = 30) -> float:
+    """Project revenue over ``days`` from an average daily view count.
+
+    ``monetized_share`` is the fraction of views that carry ads (0-1), since
+    not every playback is monetized. For example 2,000 daily views at a $3 RPM
+    with 60% monetized views gives ``108.0`` over 30 days.
+
+    Raises:
+        ValueError: if inputs are negative, ``days`` < 1, or the share exceeds 1.
+    """
+    if daily_views < 0:
+        raise ValueError("daily_views must be non-negative")
+    if not 0 <= monetized_share <= 1:
+        raise ValueError("monetized_share must be between 0 and 1")
+    if days < 1:
+        raise ValueError("days must be at least 1")
+    return estimate_revenue(round(daily_views * monetized_share * days), rpm)
