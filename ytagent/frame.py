@@ -76,3 +76,19 @@ def filter_date_range(df: pd.DataFrame, start: Optional[str] = None, end: Option
     if high is not None:
         mask &= ordered["date"] <= high
     return ordered[mask].reset_index(drop=True)
+
+
+def weekly_gains(df: pd.DataFrame) -> pd.DataFrame:
+    """Return new subscribers and watch hours gained per calendar week.
+
+    Builds on :func:`add_daily_gains` and resamples by week ending Sunday,
+    so the result is indexed by ``week_ending`` with ``new_subscribers`` and
+    ``new_watch_hours`` columns. Handy for weekly creator reports.
+
+    Raises:
+        ValueError: if a required column is missing.
+    """
+    gains = add_daily_gains(df).set_index("date")
+    weekly = gains[["new_subscribers", "new_watch_hours"]].resample("W-SUN").sum()
+    weekly.index.name = "week_ending"
+    return weekly
