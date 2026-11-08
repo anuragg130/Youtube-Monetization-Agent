@@ -28,3 +28,12 @@ def test_main_prints_revenue_projection(capsys):
 def test_main_omits_revenue_without_daily_views(capsys):
     main(["1500", "4200"])
     assert "Projected" not in capsys.readouterr().out
+
+
+def test_main_reports_shorts_route(capsys):
+    from ytagent.cli import main
+
+    assert main(["1200", "100", "--shorts-views", "8000000"]) == 0
+    assert "Shorts route: 2,000,000 more Shorts views needed" in capsys.readouterr().out
+    main(["1200", "100", "--shorts-views", "10000000"])
+    assert "Shorts route: eligible" in capsys.readouterr().out
