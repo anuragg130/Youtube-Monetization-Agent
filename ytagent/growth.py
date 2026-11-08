@@ -91,3 +91,20 @@ def weekly_totals(daily_values: Sequence[float], week_length: int = 7) -> List[f
         round(sum(daily_values[i : i + week_length]), 2)
         for i in range(0, len(daily_values), week_length)
     ]
+
+
+def longest_growth_streak(counts: Sequence[float]) -> int:
+    """Return the longest run of consecutive days with a positive gain.
+
+    Flat or declining days break the streak, so ``[10, 12, 15, 15, 18]``
+    gives ``2``. A quick consistency signal to pair with
+    :func:`average_daily_growth`, which can hide stalls behind one big day.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    best = current = 0
+    for change in daily_changes(counts):
+        current = current + 1 if change > 0 else 0
+        best = max(best, current)
+    return best
