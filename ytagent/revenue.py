@@ -71,3 +71,21 @@ def project_monthly_revenue(daily_views: float, rpm: float, monetized_share: flo
     if days < 1:
         raise ValueError("days must be at least 1")
     return estimate_revenue(round(daily_views * monetized_share * days), rpm)
+
+
+def rpm_from_cpm(cpm: float, creator_share: float = 0.55, monetized_share: float = 1.0) -> float:
+    """Estimate RPM from an advertiser CPM.
+
+    CPM is what advertisers pay per 1,000 ad impressions; RPM is what the
+    creator earns per 1,000 views. YouTube's standard long-form split gives
+    creators 55% of ad revenue, and only ``monetized_share`` of views show
+    ads. For example a $10 CPM with 60% monetized views gives an RPM of 3.3.
+
+    Raises:
+        ValueError: if ``cpm`` is negative or a share is outside ``[0, 1]``.
+    """
+    if cpm < 0:
+        raise ValueError("cpm must be non-negative")
+    if not 0 <= creator_share <= 1 or not 0 <= monetized_share <= 1:
+        raise ValueError("shares must be between 0 and 1")
+    return round(cpm * creator_share * monetized_share, 2)
