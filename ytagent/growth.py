@@ -123,3 +123,22 @@ def project_value(counts: Sequence[float], days_ahead: int) -> float:
     if days_ahead < 0:
         raise ValueError("days_ahead must be non-negative")
     return round(counts[-1] + average_daily_growth(counts) * days_ahead, 2)
+
+
+def compound_daily_growth_rate(counts: Sequence[float]) -> float:
+    """Return the average compounded daily growth rate as a percentage.
+
+    Unlike :func:`percent_growth`, this spreads the overall change evenly
+    across each day, so ``[1000, 1100, 1210]`` gives ``10.0``. It is the
+    daily equivalent of CAGR and is useful for comparing windows of
+    different lengths.
+
+    Raises:
+        ValueError: if fewer than two values are given or any value is not positive.
+    """
+    if len(counts) < 2:
+        raise ValueError("need at least two daily values")
+    if min(counts) <= 0:
+        raise ValueError("all values must be positive")
+    days = len(counts) - 1
+    return round(((counts[-1] / counts[0]) ** (1 / days) - 1) * 100, 2)
