@@ -108,3 +108,18 @@ def longest_growth_streak(counts: Sequence[float]) -> int:
         current = current + 1 if change > 0 else 0
         best = max(best, current)
     return best
+
+
+def project_value(counts: Sequence[float], days_ahead: int) -> float:
+    """Linearly project a cumulative total ``days_ahead`` days past the last value.
+
+    Uses :func:`average_daily_growth` as the slope, so ``[620, 640, 655, 690, 710]``
+    projected 10 days ahead gives ``935.0``. Handy for "where will we be next
+    month?" estimates of subscribers or watch hours.
+
+    Raises:
+        ValueError: if fewer than two values are given or ``days_ahead`` is negative.
+    """
+    if days_ahead < 0:
+        raise ValueError("days_ahead must be non-negative")
+    return round(counts[-1] + average_daily_growth(counts) * days_ahead, 2)
