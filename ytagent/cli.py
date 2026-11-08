@@ -8,6 +8,7 @@ import argparse
 from typing import List, Optional
 
 from ytagent.eligibility import is_eligible
+from ytagent.milestones import days_to_next_milestone, milestone_progress
 from ytagent.progress import days_to_eligibility, eligibility_gap, progress_percent
 from ytagent.revenue import project_monthly_revenue
 from ytagent.shorts import is_shorts_eligible, shorts_gap
@@ -40,6 +41,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--rpm", type=float, default=2.0, help="revenue per 1,000 monetized views")
     parser.add_argument("--monetized-share", type=float, default=1.0)
     parser.add_argument("--shorts-views", type=int, help="public Shorts views in the last 90 days")
+    parser.add_argument("--milestone", action="store_true", help="also report the next subscriber milestone")
     args = parser.parse_args(argv)
     print(build_report(args.subscribers, args.watch_hours, args.subs_per_day, args.hours_per_day))
     if args.shorts_views is not None:
@@ -48,6 +50,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         else:
             needed = shorts_gap(args.subscribers, args.shorts_views)["shorts_views_needed"]
             print(f"Shorts route: {needed:,} more Shorts views needed")
+    if args.milestone:
+        target, pct = milestone_progress(args.subscribers)
+        if target is None:
+            print("Next milestone: all milestones reached")
+        else:
+            days = days_to_next_milestone(args.subscribers, args.subs_per_day)
+            eta = "" if days is None else f", ~{days} days"
+            print(f"Next milestone: {target:,} subscribers ({pct}%{eta})")
     if args.daily_views is not None:
         monthly = project_monthly_revenue(args.daily_views, args.rpm, args.monetized_share)
         print(f"Projected 30-day revenue: ${monthly:.2f}")

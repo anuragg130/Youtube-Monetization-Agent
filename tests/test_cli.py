@@ -37,3 +37,13 @@ def test_main_reports_shorts_route(capsys):
     assert "Shorts route: 2,000,000 more Shorts views needed" in capsys.readouterr().out
     main(["1200", "100", "--shorts-views", "10000000"])
     assert "Shorts route: eligible" in capsys.readouterr().out
+
+
+def test_main_prints_next_milestone_with_eta(capsys):
+    main(["750", "100", "--subs-per-day", "20", "--milestone"])
+    assert "Next milestone: 1,000 subscribers (50.0%, ~13 days)" in capsys.readouterr().out
+
+
+def test_main_omits_milestone_by_default(capsys):
+    main(["750", "100"])
+    assert "Next milestone" not in capsys.readouterr().out
