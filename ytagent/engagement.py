@@ -64,3 +64,19 @@ def channel_engagement_rate(videos: Iterable[Mapping[str, int]]) -> float:
         comments += counts[1]
         views += counts[2]
     return engagement_rate(likes, comments, views)
+
+
+def average_percentage_viewed(avg_view_duration_seconds: float, video_length_seconds: float) -> float:
+    """Return how much of a video the average viewer watched, as a percentage.
+
+    This mirrors YouTube Studio's "average percentage viewed" retention metric.
+    Rewatches can push the raw ratio above 100%, so the result is capped there.
+
+    Raises:
+        ValueError: if the duration is negative or the video length is not positive.
+    """
+    if avg_view_duration_seconds < 0:
+        raise ValueError("avg_view_duration_seconds must be non-negative")
+    if video_length_seconds <= 0:
+        raise ValueError("video_length_seconds must be positive")
+    return round(min(100.0, avg_view_duration_seconds / video_length_seconds * 100), 1)
