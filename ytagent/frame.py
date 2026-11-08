@@ -1,5 +1,5 @@
 """pandas helpers for daily channel analytics exports."""
-from typing import Dict
+from typing import Dict, Optional
 
 import pandas as pd
 
@@ -51,3 +51,28 @@ def add_daily_gains(df: pd.DataFrame) -> pd.DataFrame:
     ordered["new_subscribers"] = ordered["subscribers"].diff().fillna(0).astype(int)
     ordered["new_watch_hours"] = ordered["watch_hours"].diff().fillna(0.0)
     return ordered
+
+
+def filter_date_range(df: pd.DataFrame, start: Optional[str] = None, end: Optional[str] = None) -> pd.DataFrame:
+    """Return the rows of ``df`` whose ``date`` falls within ``[start, end]``.
+
+    Either bound may be omitted. Dates are parsed with :func:`pandas.to_datetime`
+    and the result is sorted by date, ready for :func:`summarize_daily_frame`
+    when only a recent window (e.g. the last 28 days) is of interest.
+
+    Raises:
+        ValueError: if the ``date`` column is missing or ``start`` is after ``end``.
+    """
+    if "date" not in df.columns:
+        raise ValueError("missing columns: date")
+    low = pd.to_datetime(start) if start is not None else None
+    high = pd.to_datetime(end) if end is not None else None
+    if low is not None and high is not None and low > high:
+        raise ValueError("start must not be after end")
+    ordered = df.assign(date=pd.to_datetime(df["date"])).sort_values("date")
+    mask = pd.Series(True, index=ordered.index)
+    if low is not None:
+        mask &= ordered["date"] >= low
+    if high is not None:
+        mask &= ordered["date"] <= high
+    return ordered[mask].reset_index(drop=True)
