@@ -28,3 +28,20 @@ def shorts_gap(subscribers: int, shorts_views_90d: int) -> Dict[str, int]:
         "subscribers_needed": max(0, SUBSCRIBER_THRESHOLD - subscribers),
         "shorts_views_needed": max(0, SHORTS_VIEWS_THRESHOLD - shorts_views_90d),
     }
+
+
+def shorts_progress_percent(subscribers: int, shorts_views_90d: int) -> Dict[str, float]:
+    """Return progress toward each Shorts-route threshold as a percentage.
+
+    Mirrors :func:`ytagent.progress.progress_percent` for the Shorts path.
+    Each value is capped at 100.0 and rounded to one decimal place.
+
+    Raises:
+        ValueError: if either metric is negative.
+    """
+    if subscribers < 0 or shorts_views_90d < 0:
+        raise ValueError("subscribers and shorts views must be non-negative")
+    return {
+        "subscribers": round(min(100.0, subscribers / SUBSCRIBER_THRESHOLD * 100), 1),
+        "shorts_views": round(min(100.0, shorts_views_90d / SHORTS_VIEWS_THRESHOLD * 100), 1),
+    }
