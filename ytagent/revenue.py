@@ -89,3 +89,23 @@ def rpm_from_cpm(cpm: float, creator_share: float = 0.55, monetized_share: float
     if not 0 <= creator_share <= 1 or not 0 <= monetized_share <= 1:
         raise ValueError("shares must be between 0 and 1")
     return round(cpm * creator_share * monetized_share, 2)
+
+
+def break_even_daily_views(monthly_costs: float, rpm: float, monetized_share: float = 1.0, days: int = 30) -> int:
+    """Return the average daily views needed to cover ``monthly_costs``.
+
+    The inverse of :func:`project_monthly_revenue`: useful for checking
+    whether editing, gear or software spend is covered by ad revenue. For
+    example $300 of monthly costs at a $3 RPM with 50% monetized views needs
+    6,667 views a day over 30 days.
+
+    Raises:
+        ValueError: if costs are negative, ``rpm`` is not positive,
+            ``monetized_share`` is not in ``(0, 1]`` or ``days`` < 1.
+    """
+    if not 0 < monetized_share <= 1:
+        raise ValueError("monetized_share must be greater than 0 and at most 1")
+    if days < 1:
+        raise ValueError("days must be at least 1")
+    monetized_needed = views_needed_for_revenue(monthly_costs, rpm)
+    return math.ceil(round(monetized_needed / monetized_share / days, 6))
