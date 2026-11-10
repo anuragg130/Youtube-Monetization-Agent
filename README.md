@@ -68,12 +68,15 @@ print(summarize_daily_frame(df))
 ### Shorts route and daily gains
 
 ```python
-from ytagent.frame import add_daily_gains
-from ytagent.shorts import is_shorts_eligible, shorts_gap
+from ytagent.frame import add_daily_gains, best_day
+from ytagent.shorts import is_shorts_eligible, shorts_gap, shorts_progress_percent
 
 print(is_shorts_eligible(1200, 8_000_000))  # False
 print(shorts_gap(1200, 8_000_000))          # {'subscribers_needed': 0, 'shorts_views_needed': 2000000}
+print(shorts_progress_percent(1200, 8_000_000))  # {'subscribers': 100.0, 'shorts_views': 80.0}
 print(add_daily_gains(df)[["date", "new_subscribers", "new_watch_hours"]])
+print(best_day(df))                    # e.g. {'date': '2026-11-02', 'gain': 30}
+print(best_day(df, "new_watch_hours"))  # biggest single-day watch-hour gain
 ```
 
 ## Command line
