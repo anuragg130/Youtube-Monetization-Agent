@@ -92,3 +92,23 @@ def weekly_gains(df: pd.DataFrame) -> pd.DataFrame:
     weekly = gains[["new_subscribers", "new_watch_hours"]].resample("W-SUN").sum()
     weekly.index.name = "week_ending"
     return weekly
+
+
+def best_day(df: pd.DataFrame, column: str = "new_subscribers") -> Dict[str, object]:
+    """Return the date with the largest daily gain in ``column``.
+
+    Gains come from :func:`add_daily_gains`, so ``column`` must be
+    ``new_subscribers`` or ``new_watch_hours``. Ties go to the earliest date.
+    The result is ``{"date": "YYYY-MM-DD", "gain": value}``.
+
+    Raises:
+        ValueError: if ``column`` is unsupported, a required column is
+            missing, or there are fewer than two rows.
+    """
+    if column not in ("new_subscribers", "new_watch_hours"):
+        raise ValueError("column must be 'new_subscribers' or 'new_watch_hours'")
+    if len(df) < 2:
+        raise ValueError("need at least two rows")
+    gains = add_daily_gains(df).iloc[1:]
+    row = gains.loc[gains[column].idxmax()]
+    return {"date": row["date"].strftime("%Y-%m-%d"), "gain": row[column].item()}
