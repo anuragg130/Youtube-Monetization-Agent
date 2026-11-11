@@ -100,3 +100,29 @@ def top_videos_by_engagement(videos: Iterable[Mapping[str, object]], n: int = 3)
         for video in videos
     ]
     return sorted(scored, key=lambda item: item[1], reverse=True)[:n]
+
+
+def underperforming_videos(
+    videos: Iterable[Mapping[str, object]], threshold: float = 0.5
+) -> List[Tuple[str, float]]:
+    """Return videos whose engagement rate is below ``threshold`` x the channel rate.
+
+    The channel baseline comes from :func:`channel_engagement_rate`, so a
+    ``threshold`` of 0.5 flags videos engaging at less than half the
+    channel's view-weighted average. Videos with no views are skipped, and
+    results are ``(title, engagement_rate)`` pairs sorted lowest first.
+
+    Raises:
+        ValueError: if ``threshold`` is negative or any count is negative.
+        KeyError: if a video is missing a required key.
+    """
+    if threshold < 0:
+        raise ValueError("threshold must be non-negative")
+    videos = list(videos)
+    cutoff = channel_engagement_rate(videos) * threshold
+    flagged = [
+        (str(video["title"]), engagement_rate(video["likes"], video["comments"], video["views"]))
+        for video in videos
+        if video["views"] > 0
+    ]
+    return sorted((item for item in flagged if item[1] < cutoff), key=lambda item: item[1])
