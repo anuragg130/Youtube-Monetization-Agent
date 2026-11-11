@@ -1,5 +1,5 @@
 """Audience engagement metrics derived from per-video statistics."""
-from typing import Iterable, Mapping
+from typing import Iterable, List, Mapping, Tuple
 
 
 def engagement_rate(likes: int, comments: int, views: int) -> float:
@@ -80,3 +80,23 @@ def average_percentage_viewed(avg_view_duration_seconds: float, video_length_sec
     if video_length_seconds <= 0:
         raise ValueError("video_length_seconds must be positive")
     return round(min(100.0, avg_view_duration_seconds / video_length_seconds * 100), 1)
+
+
+def top_videos_by_engagement(videos: Iterable[Mapping[str, object]], n: int = 3) -> List[Tuple[str, float]]:
+    """Return the ``n`` most engaging videos as ``(title, engagement_rate)`` pairs.
+
+    Each item needs ``title``, ``likes``, ``comments`` and ``views`` keys.
+    Rates come from :func:`engagement_rate`; ties keep their input order.
+    Videos with no views score 0.0 rather than being dropped.
+
+    Raises:
+        ValueError: if ``n`` is less than 1 or any count is negative.
+        KeyError: if a video is missing a required key.
+    """
+    if n < 1:
+        raise ValueError("n must be at least 1")
+    scored = [
+        (str(video["title"]), engagement_rate(video["likes"], video["comments"], video["views"]))
+        for video in videos
+    ]
+    return sorted(scored, key=lambda item: item[1], reverse=True)[:n]
