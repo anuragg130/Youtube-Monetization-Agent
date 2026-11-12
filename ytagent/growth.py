@@ -142,3 +142,20 @@ def compound_daily_growth_rate(counts: Sequence[float]) -> float:
         raise ValueError("all values must be positive")
     days = len(counts) - 1
     return round(((counts[-1] / counts[0]) ** (1 / days) - 1) * 100, 2)
+
+
+def growth_volatility(counts: Sequence[float]) -> float:
+    """Return the sample standard deviation of day-over-day gains.
+
+    A low value means steady growth; a high value means a few spikes or
+    stalls dominate. Compare it with :func:`average_daily_growth` to judge
+    how reliable a :func:`project_value` projection is. Two values (a single
+    daily change) give ``0.0``.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    changes = daily_changes(counts)
+    if len(changes) < 2:
+        return 0.0
+    return round(statistics.stdev(changes), 2)
