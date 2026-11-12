@@ -112,3 +112,19 @@ def best_day(df: pd.DataFrame, column: str = "new_subscribers") -> Dict[str, obj
     gains = add_daily_gains(df).iloc[1:]
     row = gains.loc[gains[column].idxmax()]
     return {"date": row["date"].strftime("%Y-%m-%d"), "gain": row[column].item()}
+
+
+def monthly_gains(df: pd.DataFrame) -> pd.DataFrame:
+    """Return new subscribers and watch hours gained per calendar month.
+
+    The monthly counterpart of :func:`weekly_gains`: gains come from
+    :func:`add_daily_gains` and are summed per month, giving a DataFrame
+    indexed by ``month`` (``"YYYY-MM"`` strings) with ``new_subscribers`` and
+    ``new_watch_hours`` columns. Months with no rows are omitted.
+
+    Raises:
+        ValueError: if a required column is missing.
+    """
+    gains = add_daily_gains(df)
+    month = gains["date"].dt.strftime("%Y-%m").rename("month")
+    return gains.groupby(month)[["new_subscribers", "new_watch_hours"]].sum()
