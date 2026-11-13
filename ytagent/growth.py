@@ -172,3 +172,16 @@ def declining_days(counts: Sequence[float]) -> List[int]:
         ValueError: if fewer than two values are given.
     """
     return [day + 1 for day, change in enumerate(daily_changes(counts)) if change < 0]
+
+
+def flat_days(counts: Sequence[float]) -> List[int]:
+    """Return the indices of days where the total did not change at all.
+
+    The counterpart of :func:`declining_days`: ``[500, 500, 510, 510, 505]``
+    gives ``[1, 3]``. A run of flat days often means analytics stopped
+    updating or the channel went quiet between uploads.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    return [day + 1 for day, change in enumerate(daily_changes(counts)) if change == 0]
