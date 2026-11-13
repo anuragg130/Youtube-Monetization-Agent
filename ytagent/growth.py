@@ -159,3 +159,16 @@ def growth_volatility(counts: Sequence[float]) -> float:
     if len(changes) < 2:
         return 0.0
     return round(statistics.stdev(changes), 2)
+
+
+def declining_days(counts: Sequence[float]) -> List[int]:
+    """Return the indices of days where the total dropped from the day before.
+
+    Indices point at the day the loss landed, matching :func:`peak_daily_gain`,
+    so ``[500, 498, 510, 505, 505]`` gives ``[1, 3]``. Useful for spotting
+    subscriber churn after a controversial upload or a bulk spam purge.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    return [day + 1 for day, change in enumerate(daily_changes(counts)) if change < 0]
