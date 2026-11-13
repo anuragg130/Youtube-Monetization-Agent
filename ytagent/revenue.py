@@ -109,3 +109,20 @@ def break_even_daily_views(monthly_costs: float, rpm: float, monetized_share: fl
         raise ValueError("days must be at least 1")
     monetized_needed = views_needed_for_revenue(monthly_costs, rpm)
     return math.ceil(round(monetized_needed / monetized_share / days, 6))
+
+
+def revenue_per_subscriber(revenue: float, subscribers: int) -> float:
+    """Return average ``revenue`` earned per subscriber, rounded to cents.
+
+    A rough measure of how valuable each subscriber is, useful when weighing
+    a subscriber milestone against :func:`estimate_revenue`. Returns 0.0
+    when the channel has no subscribers.
+
+    Raises:
+        ValueError: if revenue or subscribers is negative.
+    """
+    if revenue < 0 or subscribers < 0:
+        raise ValueError("revenue and subscribers must be non-negative")
+    if subscribers == 0:
+        return 0.0
+    return round(revenue / subscribers, 2)
