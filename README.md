@@ -79,6 +79,19 @@ print(best_day(df))                    # e.g. {'date': '2026-11-02', 'gain': 30}
 print(best_day(df, "new_watch_hours"))  # biggest single-day watch-hour gain
 ```
 
+### Income mix, smoothed gains and milestones passed
+
+```python
+from ytagent.frame import add_rolling_gains
+from ytagent.milestones import milestones_reached
+from ytagent.revenue import revenue_share_by_source
+
+print(revenue_share_by_source({"ads": 300.0, "memberships": 75.0, "super_chat": 25.0}))
+# {'ads': 75.0, 'memberships': 18.75, 'super_chat': 6.25}
+print(add_rolling_gains(df, window=7)[["date", "avg_new_subscribers"]])  # 7-day trailing mean
+print(milestones_reached(1_200))  # [100, 500, 1000]
+```
+
 ## Command line
 
 ```bash
