@@ -1,6 +1,6 @@
 """Estimate ad revenue from view counts and RPM (revenue per mille)."""
 import math
-from typing import Dict
+from typing import Dict, Mapping
 
 
 def estimate_revenue(monetized_views: int, rpm: float) -> float:
@@ -143,3 +143,25 @@ def revenue_change_percent(previous: float, current: float) -> float:
     if current < 0:
         raise ValueError("current revenue must be non-negative")
     return round((current - previous) / previous * 100, 2)
+
+
+def revenue_share_by_source(revenues: Mapping[str, float]) -> Dict[str, float]:
+    """Return each revenue source's share of the total as a percentage.
+
+    ``revenues`` maps a source name (e.g. ``"ads"``, ``"memberships"``,
+    ``"super_chat"``) to its earnings. Shares are rounded to two decimals and
+    returned largest first. An all-zero total gives 0.0 for every source.
+
+    Raises:
+        ValueError: if ``revenues`` is empty or any amount is negative.
+    """
+    if not revenues:
+        raise ValueError("revenues must not be empty")
+    if any(amount < 0 for amount in revenues.values()):
+        raise ValueError("revenue amounts must be non-negative")
+    total = sum(revenues.values())
+    shares = {
+        source: round(amount / total * 100, 2) if total else 0.0
+        for source, amount in revenues.items()
+    }
+    return dict(sorted(shares.items(), key=lambda item: (-item[1], item[0])))
