@@ -92,6 +92,16 @@ print(add_rolling_gains(df, window=7)[["date", "avg_new_subscribers"]])  # 7-day
 print(milestones_reached(1_200))  # [100, 500, 1000]
 ```
 
+### Weakest day and Shorts-route timing
+
+```python
+from ytagent.frame import worst_day
+from ytagent.shorts import days_to_shorts_eligibility
+
+print(worst_day(df))  # e.g. {'date': '2026-11-03', 'gain': -5} - a day the channel lost subs
+print(days_to_shorts_eligibility(500, 4_000_000, subs_per_day=50, shorts_views_per_day=200_000))  # 30
+```
+
 ## Command line
 
 ```bash
@@ -104,6 +114,11 @@ python -m ytagent.cli 710 2500 --subs-per-day 22.5 --hours-per-day 40
 python -m ytagent.cli 1500 4200 --daily-views 2000 --rpm 3 --monetized-share 0.6
 # Eligible for the YouTube Partner Program.
 # Projected 30-day revenue: $108.00
+
+python -m ytagent.cli 1200 100 --shorts-views 8000000 --shorts-views-per-day 100000
+# ...
+# Shorts route: 2,000,000 more Shorts views needed
+# Shorts route ETA: 20 days
 ```
 
 ## Running tests
