@@ -1,5 +1,6 @@
 """YPP eligibility via the Shorts path (subscribers + 90-day Shorts views)."""
-from typing import Dict
+import math
+from typing import Dict, Optional
 
 from ytagent.eligibility import SUBSCRIBER_THRESHOLD
 
@@ -45,3 +46,35 @@ def shorts_progress_percent(subscribers: int, shorts_views_90d: int) -> Dict[str
         "subscribers": round(min(100.0, subscribers / SUBSCRIBER_THRESHOLD * 100), 1),
         "shorts_views": round(min(100.0, shorts_views_90d / SHORTS_VIEWS_THRESHOLD * 100), 1),
     }
+
+
+def days_to_shorts_eligibility(
+    subscribers: int,
+    shorts_views_90d: int,
+    subs_per_day: float,
+    shorts_views_per_day: float,
+) -> Optional[int]:
+    """Estimate whole days until both Shorts-route thresholds are met.
+
+    The Shorts counterpart of :func:`ytagent.progress.days_to_eligibility`.
+    Assumes steady daily growth and ignores views ageing out of the 90-day
+    window. Returns 0 if already eligible, or ``None`` when a remaining gap
+    has a zero growth rate and would never close.
+
+    Raises:
+        ValueError: if any metric or growth rate is negative.
+    """
+    if subs_per_day < 0 or shorts_views_per_day < 0:
+        raise ValueError("daily growth rates must be non-negative")
+    gap = shorts_gap(subscribers, shorts_views_90d)
+    days = 0
+    for needed, rate in (
+        (gap["subscribers_needed"], subs_per_day),
+        (gap["shorts_views_needed"], shorts_views_per_day),
+    ):
+        if needed <= 0:
+            continue
+        if rate == 0:
+            return None
+        days = max(days, math.ceil(needed / rate))
+    return days
