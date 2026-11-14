@@ -1,11 +1,18 @@
 """pandas helpers for daily channel analytics exports."""
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 
 import pandas as pd
 
 from ytagent.growth import average_daily_growth
 
 REQUIRED_COLUMNS = ("date", "subscribers", "watch_hours")
+
+
+def _require_columns(df: pd.DataFrame, columns: Sequence[str] = REQUIRED_COLUMNS) -> None:
+    """Raise ``ValueError`` naming every column of ``columns`` absent from ``df``."""
+    missing = [c for c in columns if c not in df.columns]
+    if missing:
+        raise ValueError(f"missing columns: {', '.join(missing)}")
 
 
 def summarize_daily_frame(df: pd.DataFrame) -> Dict[str, float]:
@@ -18,9 +25,7 @@ def summarize_daily_frame(df: pd.DataFrame) -> Dict[str, float]:
     Raises:
         ValueError: if a required column is missing or there are fewer than two rows.
     """
-    missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
-    if missing:
-        raise ValueError(f"missing columns: {', '.join(missing)}")
+    _require_columns(df)
     if len(df) < 2:
         raise ValueError("need at least two rows")
     ordered = df.assign(date=pd.to_datetime(df["date"])).sort_values("date")
@@ -44,9 +49,7 @@ def add_daily_gains(df: pd.DataFrame) -> pd.DataFrame:
     Raises:
         ValueError: if a required column is missing.
     """
-    missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
-    if missing:
-        raise ValueError(f"missing columns: {', '.join(missing)}")
+    _require_columns(df)
     ordered = df.assign(date=pd.to_datetime(df["date"])).sort_values("date").reset_index(drop=True)
     ordered["new_subscribers"] = ordered["subscribers"].diff().fillna(0).astype(int)
     ordered["new_watch_hours"] = ordered["watch_hours"].diff().fillna(0.0)
