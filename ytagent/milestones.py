@@ -1,6 +1,6 @@
 """Subscriber milestones that creators commonly track."""
 import math
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 MILESTONES = (100, 500, 1_000, 10_000, 100_000, 1_000_000, 10_000_000)
 
@@ -49,3 +49,18 @@ def days_to_next_milestone(subscribers: int, subs_per_day: float) -> Optional[in
     if target is None or subs_per_day <= 0:
         return None
     return math.ceil((target - subscribers) / subs_per_day)
+
+
+def milestones_reached(subscribers: int) -> List[int]:
+    """Return every milestone in :data:`MILESTONES` already reached, ascending.
+
+    A milestone counts as reached once ``subscribers`` equals it, so exactly
+    1,000 subscribers includes ``1000``. Complements :func:`next_milestone`,
+    which looks at the one still ahead.
+
+    Raises:
+        ValueError: if ``subscribers`` is negative.
+    """
+    if subscribers < 0:
+        raise ValueError("subscribers must be non-negative")
+    return [milestone for milestone in MILESTONES if subscribers >= milestone]
