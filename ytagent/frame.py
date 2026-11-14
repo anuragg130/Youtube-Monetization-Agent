@@ -131,3 +131,24 @@ def monthly_gains(df: pd.DataFrame) -> pd.DataFrame:
     gains = add_daily_gains(df)
     month = gains["date"].dt.strftime("%Y-%m").rename("month")
     return gains.groupby(month)[["new_subscribers", "new_watch_hours"]].sum()
+
+
+def add_rolling_gains(df: pd.DataFrame, window: int = 7) -> pd.DataFrame:
+    """Return :func:`add_daily_gains` output with rolling-average gain columns.
+
+    Adds ``avg_new_subscribers`` and ``avg_new_watch_hours``: the mean daily
+    gain over the trailing ``window`` rows. The first ``window - 1`` rows use
+    however many days are available, so short exports still get a value.
+    Smoothing like this makes week-to-week trends easier to read than the
+    raw, spiky daily numbers.
+
+    Raises:
+        ValueError: if a required column is missing or ``window`` < 1.
+    """
+    if window < 1:
+        raise ValueError("window must be at least 1")
+    gains = add_daily_gains(df)
+    rolling = gains[["new_subscribers", "new_watch_hours"]].rolling(window, min_periods=1).mean()
+    gains["avg_new_subscribers"] = rolling["new_subscribers"]
+    gains["avg_new_watch_hours"] = rolling["new_watch_hours"]
+    return gains
