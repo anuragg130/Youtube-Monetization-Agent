@@ -126,3 +126,20 @@ def revenue_per_subscriber(revenue: float, subscribers: int) -> float:
     if subscribers == 0:
         return 0.0
     return round(revenue / subscribers, 2)
+
+
+def revenue_change_percent(previous: float, current: float) -> float:
+    """Return the percentage change in revenue between two periods.
+
+    ``revenue_change_percent(200, 250)`` gives ``25.0``; a drop gives a
+    negative value. Useful for month-over-month earnings reports alongside
+    :func:`project_monthly_revenue`.
+
+    Raises:
+        ValueError: if ``previous`` is not positive or ``current`` is negative.
+    """
+    if previous <= 0:
+        raise ValueError("previous revenue must be positive")
+    if current < 0:
+        raise ValueError("current revenue must be non-negative")
+    return round((current - previous) / previous * 100, 2)
