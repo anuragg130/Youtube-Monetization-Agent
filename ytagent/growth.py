@@ -185,3 +185,18 @@ def flat_days(counts: Sequence[float]) -> List[int]:
         ValueError: if fewer than two values are given.
     """
     return [day + 1 for day, change in enumerate(daily_changes(counts)) if change == 0]
+
+
+def best_week(daily_values: Sequence[float], week_length: int = 7) -> Tuple[int, float]:
+    """Return ``(week_index, total)`` for the strongest week of daily values.
+
+    Weeks are built with :func:`weekly_totals`, so a trailing partial week
+    is considered too. ``week_index`` is zero-based; ties keep the earliest
+    week. Handy for finding which upload week drove the most new subscribers.
+
+    Raises:
+        ValueError: if ``daily_values`` is empty or ``week_length`` < 1.
+    """
+    totals = weekly_totals(daily_values, week_length)
+    index = max(range(len(totals)), key=lambda i: totals[i])
+    return index, totals[index]
