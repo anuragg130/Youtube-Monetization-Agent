@@ -117,6 +117,26 @@ def best_day(df: pd.DataFrame, column: str = "new_subscribers") -> Dict[str, obj
     return {"date": row["date"].strftime("%Y-%m-%d"), "gain": row[column].item()}
 
 
+def worst_day(df: pd.DataFrame, column: str = "new_subscribers") -> Dict[str, object]:
+    """Return the date with the smallest daily gain in ``column``.
+
+    The counterpart of :func:`best_day`, useful for spotting days where a
+    channel lost subscribers. Ties go to the earliest date and the result is
+    ``{"date": "YYYY-MM-DD", "gain": value}``.
+
+    Raises:
+        ValueError: if ``column`` is unsupported, a required column is
+            missing, or there are fewer than two rows.
+    """
+    if column not in ("new_subscribers", "new_watch_hours"):
+        raise ValueError("column must be 'new_subscribers' or 'new_watch_hours'")
+    if len(df) < 2:
+        raise ValueError("need at least two rows")
+    gains = add_daily_gains(df).iloc[1:]
+    row = gains.loc[gains[column].idxmin()]
+    return {"date": row["date"].strftime("%Y-%m-%d"), "gain": row[column].item()}
+
+
 def monthly_gains(df: pd.DataFrame) -> pd.DataFrame:
     """Return new subscribers and watch hours gained per calendar month.
 
