@@ -165,3 +165,21 @@ def revenue_share_by_source(revenues: Mapping[str, float]) -> Dict[str, float]:
         for source, amount in revenues.items()
     }
     return dict(sorted(shares.items(), key=lambda item: (-item[1], item[0])))
+
+
+def revenue_per_watch_hour(revenue: float, watch_hours: float) -> float:
+    """Return earnings per hour of watch time, rounded to cents.
+
+    Long videos can have a modest RPM yet earn well per hour watched, so
+    this complements :func:`effective_rpm` when comparing formats. For
+    example $90 over 1,200 watch hours gives ``0.08``. Returns 0.0 when
+    there is no watch time.
+
+    Raises:
+        ValueError: if revenue or watch hours is negative.
+    """
+    if revenue < 0 or watch_hours < 0:
+        raise ValueError("revenue and watch_hours must be non-negative")
+    if watch_hours == 0:
+        return 0.0
+    return round(revenue / watch_hours, 2)
