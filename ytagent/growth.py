@@ -110,6 +110,23 @@ def longest_growth_streak(counts: Sequence[float]) -> int:
     return best
 
 
+def longest_decline_streak(counts: Sequence[float]) -> int:
+    """Return the longest run of consecutive days where the total dropped.
+
+    The counterpart of :func:`longest_growth_streak`: flat or rising days
+    break the run, so ``[500, 498, 495, 495, 490, 489]`` gives ``2``. A long
+    streak usually points at sustained churn rather than a one-off purge.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    best = current = 0
+    for change in daily_changes(counts):
+        current = current + 1 if change < 0 else 0
+        best = max(best, current)
+    return best
+
+
 def project_value(counts: Sequence[float], days_ahead: int) -> float:
     """Linearly project a cumulative total ``days_ahead`` days past the last value.
 
