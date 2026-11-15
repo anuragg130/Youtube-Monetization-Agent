@@ -119,6 +119,24 @@ df = pd.read_csv("daily_totals.csv")  # date, subscribers, watch_hours
 print(average_gain_by_weekday(df).idxmax())  # e.g. 'Saturday'
 ```
 
+### Churn, consistency and annualized earnings
+
+`longest_decline_streak` and `positive_day_share` summarise how steady
+daily growth is, `average_view_duration_minutes` recovers minutes watched
+per view from watch hours, and `annualized_revenue` scales a period's
+earnings to a full year:
+
+```python
+from ytagent.engagement import average_view_duration_minutes
+from ytagent.growth import longest_decline_streak, positive_day_share
+from ytagent.revenue import annualized_revenue
+
+print(longest_decline_streak([500, 498, 495, 495, 490, 489]))  # 2
+print(positive_day_share([100, 110, 108, 120, 120]))  # 50.0
+print(average_view_duration_minutes(250, 3000))  # 5.0
+print(annualized_revenue(250, 30))  # 3041.67
+```
+
 ## Command line
 
 ```bash
