@@ -102,6 +102,23 @@ print(worst_day(df))  # e.g. {'date': '2026-11-03', 'gain': -5} - a day the chan
 print(days_to_shorts_eligibility(500, 4_000_000, subs_per_day=50, shorts_views_per_day=200_000))  # 30
 ```
 
+### Milestones crossed and best upload days
+
+`milestones_between` lists the milestones a channel passed during a period
+(the starting count is excluded), and `average_gain_by_weekday` averages the
+daily subscriber gains of an analytics export by day of the week:
+
+```python
+import pandas as pd
+from ytagent.frame import average_gain_by_weekday
+from ytagent.milestones import milestones_between
+
+print(milestones_between(450, 1_200))  # [500, 1000]
+
+df = pd.read_csv("daily_totals.csv")  # date, subscribers, watch_hours
+print(average_gain_by_weekday(df).idxmax())  # e.g. 'Saturday'
+```
+
 ## Command line
 
 ```bash
