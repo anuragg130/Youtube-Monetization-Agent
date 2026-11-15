@@ -185,3 +185,19 @@ def revenue_per_watch_hour(revenue: float, watch_hours: float) -> float:
         return 0.0
     rate = Decimal(str(revenue)) / Decimal(str(watch_hours))
     return float(rate.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def annualized_revenue(revenue: float, days: int) -> float:
+    """Scale earnings from a ``days``-long period up to a 365-day estimate.
+
+    Lets reports covering different window lengths be compared on the same
+    footing: $250 earned over 30 days annualizes to ``3041.67``.
+
+    Raises:
+        ValueError: if ``revenue`` is negative or ``days`` < 1.
+    """
+    if revenue < 0:
+        raise ValueError("revenue must be non-negative")
+    if days < 1:
+        raise ValueError("days must be at least 1")
+    return round(revenue / days * 365, 2)
