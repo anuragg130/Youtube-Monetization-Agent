@@ -172,3 +172,26 @@ def add_rolling_gains(df: pd.DataFrame, window: int = 7) -> pd.DataFrame:
     gains["avg_new_subscribers"] = rolling["new_subscribers"]
     gains["avg_new_watch_hours"] = rolling["new_watch_hours"]
     return gains
+
+
+def average_gain_by_weekday(df: pd.DataFrame, column: str = "new_subscribers") -> pd.Series:
+    """Return the mean daily gain for each day of the week.
+
+    Uses :func:`add_daily_gains` and skips the first row, whose gain is 0
+    only because it has no prior day. The result is indexed by weekday name
+    (``"Monday"`` ... ``"Sunday"``) in calendar order, with weekdays absent
+    from the export left out. Useful for picking upload days.
+
+    Raises:
+        ValueError: if a required column is missing, ``column`` is not a gain
+            column, or there are fewer than two rows.
+    """
+    gains = add_daily_gains(df)
+    if column not in ("new_subscribers", "new_watch_hours"):
+        raise ValueError("column must be 'new_subscribers' or 'new_watch_hours'")
+    if len(gains) < 2:
+        raise ValueError("need at least two rows")
+    gains = gains.iloc[1:]
+    order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    means = gains.groupby(gains["date"].dt.day_name())[column].mean()
+    return means.reindex([day for day in order if day in means.index])
