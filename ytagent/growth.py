@@ -204,6 +204,21 @@ def flat_days(counts: Sequence[float]) -> List[int]:
     return [day + 1 for day, change in enumerate(daily_changes(counts)) if change == 0]
 
 
+def positive_day_share(counts: Sequence[float]) -> float:
+    """Return the percentage of day-over-day changes that were gains.
+
+    ``[100, 110, 108, 120, 120]`` has two gains in four changes, giving
+    ``50.0``. Complements :func:`declining_days` and :func:`flat_days` with a
+    single consistency score that is easy to track week to week.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    changes = daily_changes(counts)
+    gains = sum(1 for change in changes if change > 0)
+    return round(gains / len(changes) * 100, 2)
+
+
 def best_week(daily_values: Sequence[float], week_length: int = 7) -> Tuple[int, float]:
     """Return ``(week_index, total)`` for the strongest week of daily values.
 
