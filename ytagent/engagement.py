@@ -61,6 +61,22 @@ def watch_hours_from_views(views: int, avg_view_duration_minutes: float) -> floa
     return round(views * avg_view_duration_minutes / 60, 2)
 
 
+def average_view_duration_minutes(watch_hours: float, views: int) -> float:
+    """Return the average minutes watched per view from total watch hours.
+
+    The inverse of :func:`watch_hours_from_views`: 250 watch hours across
+    3,000 views gives ``5.0`` minutes. Returns 0.0 when there are no views.
+
+    Raises:
+        ValueError: if watch hours or views is negative.
+    """
+    if watch_hours < 0 or views < 0:
+        raise ValueError("watch_hours and views must be non-negative")
+    if views == 0:
+        return 0.0
+    return round(watch_hours * 60 / views, 2)
+
+
 def channel_engagement_rate(videos: Iterable[Mapping[str, int]]) -> float:
     """Return the view-weighted engagement rate across several videos.
 
