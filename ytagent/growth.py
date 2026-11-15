@@ -200,3 +200,19 @@ def best_week(daily_values: Sequence[float], week_length: int = 7) -> Tuple[int,
     totals = weekly_totals(daily_values, week_length)
     index = max(range(len(totals)), key=lambda i: totals[i])
     return index, totals[index]
+
+
+def worst_week(daily_values: Sequence[float], week_length: int = 7) -> Tuple[int, float]:
+    """Return ``(week_index, total)`` for the weakest week of daily values.
+
+    The counterpart of :func:`best_week`: weeks come from
+    :func:`weekly_totals` (a trailing partial week included), the index is
+    zero-based and ties keep the earliest week. Note that a short trailing
+    week naturally has a lower total, so trim it first if that matters.
+
+    Raises:
+        ValueError: if ``daily_values`` is empty or ``week_length`` < 1.
+    """
+    totals = weekly_totals(daily_values, week_length)
+    index = min(range(len(totals)), key=lambda i: totals[i])
+    return index, totals[index]
