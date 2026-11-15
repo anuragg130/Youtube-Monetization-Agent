@@ -143,3 +143,21 @@ def underperforming_videos(
         if video["views"] > 0
     ]
     return sorted((item for item in flagged if item[1] < cutoff), key=lambda item: item[1])
+
+
+def like_to_comment_ratio(likes: int, comments: int) -> float:
+    """Return how many likes a video earned for every comment.
+
+    Very high ratios mean viewers react passively; low ratios mean the
+    video provokes discussion (for better or worse). Pair it with
+    :func:`comments_per_thousand_views` to tell the two apart. Returns 0.0
+    when there are no comments, since the ratio is undefined.
+
+    Raises:
+        ValueError: if either count is negative.
+    """
+    if likes < 0 or comments < 0:
+        raise ValueError("likes and comments must be non-negative")
+    if comments == 0:
+        return 0.0
+    return round(likes / comments, 2)
