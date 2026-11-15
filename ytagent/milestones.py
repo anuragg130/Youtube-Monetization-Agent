@@ -64,3 +64,20 @@ def milestones_reached(subscribers: int) -> List[int]:
     if subscribers < 0:
         raise ValueError("subscribers must be non-negative")
     return [milestone for milestone in MILESTONES if subscribers >= milestone]
+
+
+def milestones_between(start: int, end: int) -> List[int]:
+    """Return the milestones crossed while growing from ``start`` to ``end``.
+
+    A milestone counts when ``start < milestone <= end``, so a channel that
+    was already at 1,000 subscribers does not "cross" 1,000 again. Handy for
+    a weekly recap of what the channel unlocked.
+
+    Raises:
+        ValueError: if either count is negative or ``end`` is below ``start``.
+    """
+    if start < 0 or end < 0:
+        raise ValueError("subscriber counts must be non-negative")
+    if end < start:
+        raise ValueError("end must not be below start")
+    return [milestone for milestone in MILESTONES if start < milestone <= end]
