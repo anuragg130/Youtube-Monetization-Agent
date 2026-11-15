@@ -18,3 +18,7 @@ def test_zero_watch_hours_returns_zero():
 def test_negative_inputs_rejected():
     with pytest.raises(ValueError):
         revenue_per_watch_hour(-5, 100)
+
+
+def test_half_cent_rounds_up():
+    assert revenue_per_watch_hour(1, 200) == 0.01

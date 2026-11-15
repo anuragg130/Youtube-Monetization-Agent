@@ -1,5 +1,6 @@
 """Estimate ad revenue from view counts and RPM (revenue per mille)."""
 import math
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Dict, Mapping
 
 
@@ -182,4 +183,5 @@ def revenue_per_watch_hour(revenue: float, watch_hours: float) -> float:
         raise ValueError("revenue and watch_hours must be non-negative")
     if watch_hours == 0:
         return 0.0
-    return round(revenue / watch_hours, 2)
+    rate = Decimal(str(revenue)) / Decimal(str(watch_hours))
+    return float(rate.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
