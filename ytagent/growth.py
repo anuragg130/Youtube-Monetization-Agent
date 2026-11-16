@@ -264,3 +264,20 @@ def largest_daily_drop(counts: Sequence[float]) -> Tuple[int, float]:
     changes = daily_changes(counts)
     worst = min(range(len(changes)), key=lambda i: changes[i])
     return worst + 1, changes[worst]
+
+
+def days_since_peak(counts: Sequence[float]) -> int:
+    """Return how many days have passed since the series hit its highest value.
+
+    ``0`` means the latest value is the (joint) all-time high, so the channel
+    is still at its peak. ``[100, 140, 130, 120]`` gives ``2``. When the peak
+    value occurs more than once, the most recent occurrence is used.
+
+    Raises:
+        ValueError: if ``counts`` is empty.
+    """
+    if not counts:
+        raise ValueError("counts must not be empty")
+    peak = max(counts)
+    last_peak = max(i for i, value in enumerate(counts) if value == peak)
+    return len(counts) - 1 - last_peak
