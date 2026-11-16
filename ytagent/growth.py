@@ -248,3 +248,19 @@ def worst_week(daily_values: Sequence[float], week_length: int = 7) -> Tuple[int
     totals = weekly_totals(daily_values, week_length)
     index = min(range(len(totals)), key=lambda i: totals[i])
     return index, totals[index]
+
+
+def largest_daily_drop(counts: Sequence[float]) -> Tuple[int, float]:
+    """Return ``(day_index, change)`` for the biggest day-over-day decrease.
+
+    The counterpart of :func:`peak_daily_gain`: ``day_index`` points at the
+    day the loss landed, so ``[500, 498, 470, 480]`` gives ``(2, -28)``. If
+    the total never fell, the smallest change is returned (zero or positive),
+    so callers can check ``change < 0``. Ties keep the earliest day.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    changes = daily_changes(counts)
+    worst = min(range(len(changes)), key=lambda i: changes[i])
+    return worst + 1, changes[worst]
