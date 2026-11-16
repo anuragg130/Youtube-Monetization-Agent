@@ -17,6 +17,24 @@ def estimate_revenue(monetized_views: int, rpm: float) -> float:
     return round(monetized_views / 1000 * rpm, 2)
 
 
+def rpm_needed_for_target(target_revenue: float, monetized_views: int) -> float:
+    """Return the RPM required to earn ``target_revenue`` from ``monetized_views``.
+
+    The inverse of :func:`estimate_revenue` for a fixed view count: earning
+    $250 from 50,000 monetized views needs an RPM of ``5.0``. Compare the
+    result with your channel's :func:`effective_rpm` to see whether a revenue
+    goal is realistic without more views.
+
+    Raises:
+        ValueError: if the target is negative or views are not positive.
+    """
+    if target_revenue < 0:
+        raise ValueError("target_revenue must be non-negative")
+    if monetized_views <= 0:
+        raise ValueError("monetized_views must be positive")
+    return round(target_revenue / monetized_views * 1000, 2)
+
+
 def effective_rpm(revenue: float, views: int) -> float:
     """Return the observed RPM given total ``revenue`` over ``views``.
 
