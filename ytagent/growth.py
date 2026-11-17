@@ -281,3 +281,26 @@ def days_since_peak(counts: Sequence[float]) -> int:
     peak = max(counts)
     last_peak = max(i for i, value in enumerate(counts) if value == peak)
     return len(counts) - 1 - last_peak
+
+
+def max_drawdown_percent(counts: Sequence[float]) -> float:
+    """Return the largest peak-to-trough fall in ``counts`` as a percentage.
+
+    Measures the worst setback relative to the running high, e.g. a channel
+    that peaked at 1,000 subscribers and later dipped to 900 has a drawdown
+    of ``10.0``. ``[800, 1000, 950, 900, 1100]`` gives ``10.0``. A series that
+    never falls below a previous high returns ``0.0``.
+
+    Raises:
+        ValueError: if ``counts`` is empty or contains a non-positive value.
+    """
+    if not counts:
+        raise ValueError("counts must not be empty")
+    if any(value <= 0 for value in counts):
+        raise ValueError("all values must be positive")
+    running_high = counts[0]
+    worst = 0.0
+    for value in counts:
+        running_high = max(running_high, value)
+        worst = max(worst, (running_high - value) / running_high * 100)
+    return round(worst, 2)
