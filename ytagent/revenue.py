@@ -219,3 +219,21 @@ def annualized_revenue(revenue: float, days: int) -> float:
     if days < 1:
         raise ValueError("days must be at least 1")
     return round(revenue / days * 365, 2)
+
+
+def daily_revenue_needed(target_revenue: float, earned_so_far: float, days_remaining: int) -> float:
+    """Return the average daily revenue required to hit ``target_revenue``.
+
+    Useful mid-month: with a $500 goal, $320 already earned and 9 days left,
+    the channel needs ``20.0`` per day. Returns ``0.0`` once the target has
+    already been reached.
+
+    Raises:
+        ValueError: if any amount is negative or ``days_remaining`` < 1.
+    """
+    if target_revenue < 0 or earned_so_far < 0:
+        raise ValueError("revenue amounts must be non-negative")
+    if days_remaining < 1:
+        raise ValueError("days_remaining must be at least 1")
+    shortfall = max(target_revenue - earned_so_far, 0.0)
+    return round(shortfall / days_remaining, 2)
