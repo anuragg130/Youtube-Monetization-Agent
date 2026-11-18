@@ -304,3 +304,23 @@ def max_drawdown_percent(counts: Sequence[float]) -> float:
         running_high = max(running_high, value)
         worst = max(worst, (running_high - value) / running_high * 100)
     return round(worst, 2)
+
+
+def growth_acceleration(counts: Sequence[float]) -> float:
+    """Return how much the average daily gain changed between halves of ``counts``.
+
+    The daily changes are split into an earlier and a later half (the middle
+    change is dropped when the count is odd) and the earlier average is
+    subtracted from the later one. A positive result means growth is speeding
+    up: ``[100, 110, 120, 140, 160]`` gives ``10.0`` (gains of 10 then 20).
+
+    Raises:
+        ValueError: if ``counts`` has fewer than three values.
+    """
+    if len(counts) < 3:
+        raise ValueError("need at least three values to measure acceleration")
+    changes = daily_changes(counts)
+    half = len(changes) // 2
+    earlier = changes[:half]
+    later = changes[-half:]
+    return round(statistics.mean(later) - statistics.mean(earlier), 2)
