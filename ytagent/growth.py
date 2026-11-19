@@ -350,3 +350,18 @@ def longest_drawdown_days(counts: Sequence[float]) -> int:
             current += 1
             longest = max(longest, current)
     return longest
+
+
+def above_average_days(counts: Sequence[float]) -> List[int]:
+    """Return indices of daily changes that beat the mean daily gain.
+
+    Index ``i`` refers to the change from ``counts[i]`` to ``counts[i + 1]``,
+    matching :func:`declining_days`. Useful for finding which uploads or
+    promotions drove unusually strong days.
+
+    Raises:
+        ValueError: if fewer than two daily values are given.
+    """
+    changes = daily_changes(counts)
+    mean = statistics.mean(changes)
+    return [i for i, change in enumerate(changes) if change > mean]
