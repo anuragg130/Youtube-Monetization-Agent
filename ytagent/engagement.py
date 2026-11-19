@@ -212,3 +212,20 @@ def like_to_comment_ratio(likes: int, comments: int) -> float:
     if comments == 0:
         return 0.0
     return round(likes / comments, 2)
+
+
+def share_to_like_ratio(shares: int, likes: int) -> float:
+    """Return shares earned per like, as a percentage.
+
+    Sharing is a stronger signal than liking, so a high ratio suggests the
+    video spreads beyond the existing audience. Complements
+    :func:`like_to_comment_ratio`. Returns 0.0 when there are no likes.
+
+    Raises:
+        ValueError: if either count is negative.
+    """
+    if shares < 0 or likes < 0:
+        raise ValueError("shares and likes must be non-negative")
+    if likes == 0:
+        return 0.0
+    return round(shares / likes * 100, 2)
