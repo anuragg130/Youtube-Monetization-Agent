@@ -324,3 +324,29 @@ def growth_acceleration(counts: Sequence[float]) -> float:
     earlier = changes[:half]
     later = changes[-half:]
     return round(statistics.mean(later) - statistics.mean(earlier), 2)
+
+
+def longest_drawdown_days(counts: Sequence[float]) -> int:
+    """Return the longest run of consecutive days spent below a previous high.
+
+    Complements :func:`max_drawdown_percent`, which measures how deep the
+    worst setback was, by measuring how long the channel stayed under water.
+    A day counts as recovered once the value reaches the running high again.
+    ``[100, 120, 110, 115, 125, 90]`` gives ``2``; a series that only ever
+    rises or stays flat gives ``0``.
+
+    Raises:
+        ValueError: if ``counts`` is empty.
+    """
+    if not counts:
+        raise ValueError("counts must not be empty")
+    running_high = counts[0]
+    current = longest = 0
+    for value in counts:
+        if value >= running_high:
+            running_high = value
+            current = 0
+        else:
+            current += 1
+            longest = max(longest, current)
+    return longest
