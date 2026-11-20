@@ -1,7 +1,7 @@
 """Estimate ad revenue from view counts and RPM (revenue per mille)."""
 import math
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Dict, Mapping
+from typing import Dict, List, Mapping, Sequence
 
 
 def estimate_revenue(monetized_views: int, rpm: float) -> float:
@@ -237,3 +237,22 @@ def daily_revenue_needed(target_revenue: float, earned_so_far: float, days_remai
         raise ValueError("days_remaining must be at least 1")
     shortfall = max(target_revenue - earned_so_far, 0.0)
     return round(shortfall / days_remaining, 2)
+
+
+def cumulative_revenue(daily_revenues: Sequence[float]) -> List[float]:
+    """Return the running total of ``daily_revenues``.
+
+    Handy for plotting month-to-date earnings: ``[10, 12.5, 7.25]`` gives
+    ``[10.0, 22.5, 29.75]``. An empty sequence yields an empty list.
+
+    Raises:
+        ValueError: if any daily amount is negative.
+    """
+    totals: List[float] = []
+    running = 0.0
+    for amount in daily_revenues:
+        if amount < 0:
+            raise ValueError("daily revenues must be non-negative")
+        running += amount
+        totals.append(round(running, 2))
+    return totals
