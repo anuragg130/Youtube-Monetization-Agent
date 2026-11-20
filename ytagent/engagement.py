@@ -229,3 +229,21 @@ def share_to_like_ratio(shares: int, likes: int) -> float:
     if likes == 0:
         return 0.0
     return round(shares / likes * 100, 2)
+
+
+def views_per_subscriber(views: int, subscribers: int) -> float:
+    """Return average views earned per subscriber.
+
+    A value above 1.0 means videos reach beyond the existing subscriber
+    base (e.g. via search or recommendations); a value well below 1.0
+    suggests many subscribers no longer watch. Returns 0.0 when the channel
+    has no subscribers.
+
+    Raises:
+        ValueError: if either count is negative.
+    """
+    if views < 0 or subscribers < 0:
+        raise ValueError("views and subscribers must be non-negative")
+    if subscribers == 0:
+        return 0.0
+    return round(views / subscribers, 2)
