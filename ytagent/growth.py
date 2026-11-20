@@ -365,3 +365,18 @@ def above_average_days(counts: Sequence[float]) -> List[int]:
     changes = daily_changes(counts)
     mean = statistics.mean(changes)
     return [i for i, change in enumerate(changes) if change > mean]
+
+
+def below_average_days(counts: Sequence[float]) -> List[int]:
+    """Return indices of daily changes that fall short of the mean daily gain.
+
+    The counterpart to :func:`above_average_days`; index ``i`` refers to the
+    change from ``counts[i]`` to ``counts[i + 1]``. Useful for spotting
+    weak days worth investigating (missed uploads, algorithm dips).
+
+    Raises:
+        ValueError: if fewer than two daily values are given.
+    """
+    changes = daily_changes(counts)
+    mean = statistics.mean(changes)
+    return [i for i, change in enumerate(changes) if change < mean]
