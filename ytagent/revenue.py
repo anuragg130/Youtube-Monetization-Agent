@@ -275,3 +275,34 @@ def payout_day(daily_revenues: Sequence[float], threshold: float = 100.0) -> Opt
         if total >= threshold:
             return day
     return None
+
+
+def rpm_by_video(videos: Sequence[Mapping[str, float]]) -> Dict[str, float]:
+    """Return each video's observed RPM plus the view-weighted channel RPM.
+
+    Each mapping needs ``title``, ``revenue`` and ``views`` keys. Per-video
+    values come from :func:`effective_rpm`; the extra ``"__overall__"`` entry
+    divides total revenue by total views, so heavily viewed videos count
+    more than a simple average of the per-video RPMs would.
+
+    Raises:
+        ValueError: if ``videos`` is empty, a key is missing, a title repeats,
+            or any revenue or view count is negative.
+    """
+    if not videos:
+        raise ValueError("videos must not be empty")
+    rpms: Dict[str, float] = {}
+    total_revenue = 0.0
+    total_views = 0
+    for video in videos:
+        try:
+            title, revenue, views = video["title"], video["revenue"], int(video["views"])
+        except KeyError as exc:
+            raise ValueError(f"video is missing {exc.args[0]!r}") from None
+        if title in rpms:
+            raise ValueError(f"duplicate video title {title!r}")
+        rpms[str(title)] = effective_rpm(revenue, views)
+        total_revenue += revenue
+        total_views += views
+    rpms["__overall__"] = effective_rpm(total_revenue, total_views)
+    return rpms
