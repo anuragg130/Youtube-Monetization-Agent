@@ -1,6 +1,6 @@
 """Subscriber milestones that creators commonly track."""
 import math
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MILESTONES = (100, 500, 1_000, 10_000, 100_000, 1_000_000, 10_000_000)
 
@@ -81,3 +81,28 @@ def milestones_between(start: int, end: int) -> List[int]:
     if end < start:
         raise ValueError("end must not be below start")
     return [milestone for milestone in MILESTONES if start < milestone <= end]
+
+
+def milestone_days(daily_subscribers: Sequence[int]) -> Dict[int, int]:
+    """Map each milestone to the first day index on which it was reached.
+
+    Only milestones crossed during the series count (see
+    :func:`milestones_between`), so ``[90, 120, 480, 510]`` gives
+    ``{100: 1, 500: 3}``. Subscriber dips followed by a recovery do not
+    re-trigger a milestone. Useful for annotating growth charts.
+
+    Raises:
+        ValueError: if the series is empty or contains a negative count.
+    """
+    if not daily_subscribers:
+        raise ValueError("daily_subscribers must not be empty")
+    if any(count < 0 for count in daily_subscribers):
+        raise ValueError("subscriber counts must be non-negative")
+    reached: Dict[int, int] = {}
+    high = daily_subscribers[0]
+    for day, count in enumerate(daily_subscribers[1:], start=1):
+        if count > high:
+            for milestone in milestones_between(high, count):
+                reached[milestone] = day
+            high = count
+    return reached
