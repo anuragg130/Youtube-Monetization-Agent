@@ -32,3 +32,14 @@ def test_rejects_empty_or_incomplete_frames():
         fill_missing_dates(pd.DataFrame(columns=["date", "subscribers", "watch_hours"]))
     with pytest.raises(ValueError, match="watch_hours"):
         fill_missing_dates(pd.DataFrame({"date": ["2026-11-01"], "subscribers": [1]}))
+
+
+def test_integer_columns_keep_their_dtype():
+    df = pd.DataFrame({
+        "date": ["2026-11-01", "2026-11-03"],
+        "subscribers": [100, 120],
+        "watch_hours": [40.0, 45.0],
+    })
+    result = fill_missing_dates(df)
+    assert result["subscribers"].dtype == df["subscribers"].dtype
+    assert result["watch_hours"].dtype == df["watch_hours"].dtype

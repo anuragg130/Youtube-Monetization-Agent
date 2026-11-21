@@ -226,7 +226,8 @@ def fill_missing_dates(df: pd.DataFrame) -> pd.DataFrame:
     Analytics exports sometimes skip days. Because ``subscribers`` and
     ``watch_hours`` are cumulative totals, a missing day is filled with the
     previous day's totals (a zero gain) rather than interpolated. Rows are
-    sorted by date, and duplicate dates keep their last row.
+    sorted by date, duplicate dates keep their last row, and column dtypes
+    are preserved (integer subscriber counts stay integers).
 
     Raises:
         ValueError: if a required column is missing or ``df`` is empty.
@@ -238,4 +239,6 @@ def fill_missing_dates(df: pd.DataFrame) -> pd.DataFrame:
     ordered = ordered.drop_duplicates("date", keep="last").set_index("date")
     full_range = pd.date_range(ordered.index[0], ordered.index[-1], freq="D")
     filled = ordered.reindex(full_range).ffill()
+    # reindexing introduces NaN, which upcasts int columns; restore them
+    filled = filled.astype(ordered.dtypes.to_dict())
     return filled.rename_axis("date").reset_index()
