@@ -137,6 +137,25 @@ print(average_view_duration_minutes(250, 3000))  # 5.0
 print(annualized_revenue(250, 30))  # 3041.67
 ```
 
+### Relative growth, interaction mix and milestone dates
+
+Percent changes compare fairly across channel sizes, the interaction mix
+shows whether viewers discuss and share or only like, and `milestone_days`
+pinpoints when each milestone was first hit:
+
+```python
+from ytagent.engagement import interaction_mix
+from ytagent.growth import daily_percent_changes
+from ytagent.milestones import milestone_days
+
+print(daily_percent_changes([100, 110, 99]))  # [10.0, -10.0]
+print(interaction_mix(80, 15, 5))  # {'likes': 80.0, 'comments': 15.0, 'shares': 5.0}
+print(milestone_days([90, 120, 480, 510]))  # {100: 1, 500: 3}
+```
+
+With a daily export, `ytagent.frame.top_days(df, n=3)` ranks the strongest
+gain days for a quick "what worked" review.
+
 ## Command line
 
 ```bash
