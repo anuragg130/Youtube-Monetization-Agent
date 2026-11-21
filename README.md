@@ -154,6 +154,10 @@ python -m ytagent.cli 1200 100 --shorts-views 8000000 --shorts-views-per-day 100
 # ...
 # Shorts route: 2,000,000 more Shorts views needed
 # Shorts route ETA: 20 days
+
+python -m ytagent.cli 1500 4200 --revenue-target 500 --earned 320 --days-left 9
+# Eligible for the YouTube Partner Program.
+# Revenue target: $20.00/day needed over 9 days
 ```
 
 ## Running tests

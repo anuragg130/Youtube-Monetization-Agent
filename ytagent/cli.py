@@ -10,7 +10,7 @@ from typing import List, Optional
 from ytagent.eligibility import is_eligible
 from ytagent.milestones import days_to_next_milestone, milestone_progress
 from ytagent.progress import days_to_eligibility, eligibility_gap, progress_percent
-from ytagent.revenue import project_monthly_revenue
+from ytagent.revenue import daily_revenue_needed, project_monthly_revenue
 from ytagent.shorts import days_to_shorts_eligibility, is_shorts_eligible, shorts_gap
 
 
@@ -45,6 +45,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--shorts-views-per-day", type=float, default=0.0, help="daily Shorts views, for a Shorts-route ETA"
     )
     parser.add_argument("--milestone", action="store_true", help="also report the next subscriber milestone")
+    parser.add_argument("--revenue-target", type=float, help="monthly revenue goal, for a daily pace check")
+    parser.add_argument("--earned", type=float, default=0.0, help="revenue earned so far this month")
+    parser.add_argument("--days-left", type=int, default=30, help="days remaining in the month")
     args = parser.parse_args(argv)
     print(build_report(args.subscribers, args.watch_hours, args.subs_per_day, args.hours_per_day))
     if args.shorts_views is not None:
@@ -69,6 +72,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.daily_views is not None:
         monthly = project_monthly_revenue(args.daily_views, args.rpm, args.monetized_share)
         print(f"Projected 30-day revenue: ${monthly:.2f}")
+    if args.revenue_target is not None:
+        needed = daily_revenue_needed(args.revenue_target, args.earned, args.days_left)
+        if needed == 0:
+            print("Revenue target: reached")
+        else:
+            print(f"Revenue target: ${needed:.2f}/day needed over {args.days_left} days")
     return 0
 
 

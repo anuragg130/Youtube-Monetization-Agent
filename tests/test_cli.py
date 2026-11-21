@@ -57,3 +57,13 @@ def test_main_reports_shorts_eta(capsys):
 def test_main_shorts_eta_never_without_sub_growth(capsys):
     main(["900", "100", "--shorts-views", "8000000", "--shorts-views-per-day", "100000"])
     assert "Shorts route ETA: never at current rates" in capsys.readouterr().out
+
+
+def test_main_reports_daily_revenue_pace(capsys):
+    main(["1500", "4200", "--revenue-target", "500", "--earned", "320", "--days-left", "9"])
+    assert "Revenue target: $20.00/day needed over 9 days" in capsys.readouterr().out
+
+
+def test_main_reports_revenue_target_reached(capsys):
+    main(["1500", "4200", "--revenue-target", "100", "--earned", "150"])
+    assert "Revenue target: reached" in capsys.readouterr().out
