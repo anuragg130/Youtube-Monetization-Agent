@@ -1,5 +1,5 @@
 """Audience engagement metrics derived from per-video statistics."""
-from typing import Iterable, List, Mapping, Tuple
+from typing import Dict, Iterable, List, Mapping, Tuple
 
 
 def engagement_rate(likes: int, comments: int, views: int) -> float:
@@ -247,3 +247,23 @@ def views_per_subscriber(views: int, subscribers: int) -> float:
     if subscribers == 0:
         return 0.0
     return round(views / subscribers, 2)
+
+
+def interaction_mix(likes: int, comments: int, shares: int) -> Dict[str, float]:
+    """Return each interaction type's percentage share of all interactions.
+
+    ``interaction_mix(80, 15, 5)`` gives
+    ``{"likes": 80.0, "comments": 15.0, "shares": 5.0}``. Shows whether a
+    video sparks discussion or sharing rather than just passive likes.
+    All shares are 0.0 when there are no interactions.
+
+    Raises:
+        ValueError: if any count is negative.
+    """
+    counts = {"likes": likes, "comments": comments, "shares": shares}
+    if any(value < 0 for value in counts.values()):
+        raise ValueError("interaction counts must be non-negative")
+    total = sum(counts.values())
+    if total == 0:
+        return {key: 0.0 for key in counts}
+    return {key: round(value / total * 100, 2) for key, value in counts.items()}
