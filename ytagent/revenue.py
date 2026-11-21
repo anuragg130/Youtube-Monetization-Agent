@@ -1,7 +1,7 @@
 """Estimate ad revenue from view counts and RPM (revenue per mille)."""
 import math
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Dict, List, Mapping, Sequence
+from typing import Dict, List, Mapping, Optional, Sequence
 
 
 def estimate_revenue(monetized_views: int, rpm: float) -> float:
@@ -256,3 +256,22 @@ def cumulative_revenue(daily_revenues: Sequence[float]) -> List[float]:
         running += amount
         totals.append(round(running, 2))
     return totals
+
+
+def payout_day(daily_revenues: Sequence[float], threshold: float = 100.0) -> Optional[int]:
+    """Return the 0-based day on which earnings first reach ``threshold``.
+
+    AdSense only pays out once the balance hits a minimum (US$100 by
+    default), so this tells a new channel which day of an export crossed
+    it. Built on :func:`cumulative_revenue`: ``[40, 35, 30]`` reaches 100
+    on day ``2``. Returns ``None`` if the threshold is never reached.
+
+    Raises:
+        ValueError: if ``threshold`` is not positive or any amount is negative.
+    """
+    if threshold <= 0:
+        raise ValueError("threshold must be positive")
+    for day, total in enumerate(cumulative_revenue(daily_revenues)):
+        if total >= threshold:
+            return day
+    return None
