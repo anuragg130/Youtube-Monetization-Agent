@@ -218,3 +218,24 @@ def top_days(df: pd.DataFrame, column: str = "new_subscribers", n: int = 5) -> p
     gains = add_daily_gains(df).iloc[1:]
     ranked = gains.sort_values([column, "date"], ascending=[False, True], kind="mergesort")
     return ranked[["date", column]].head(n).reset_index(drop=True)
+
+
+def fill_missing_dates(df: pd.DataFrame) -> pd.DataFrame:
+    """Return ``df`` with one row per calendar day between its first and last date.
+
+    Analytics exports sometimes skip days. Because ``subscribers`` and
+    ``watch_hours`` are cumulative totals, a missing day is filled with the
+    previous day's totals (a zero gain) rather than interpolated. Rows are
+    sorted by date, and duplicate dates keep their last row.
+
+    Raises:
+        ValueError: if a required column is missing or ``df`` is empty.
+    """
+    _require_columns(df)
+    if df.empty:
+        raise ValueError("need at least one row")
+    ordered = df.assign(date=pd.to_datetime(df["date"])).sort_values("date")
+    ordered = ordered.drop_duplicates("date", keep="last").set_index("date")
+    full_range = pd.date_range(ordered.index[0], ordered.index[-1], freq="D")
+    filled = ordered.reindex(full_range).ffill()
+    return filled.rename_axis("date").reset_index()
