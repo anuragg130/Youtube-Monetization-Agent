@@ -380,3 +380,20 @@ def below_average_days(counts: Sequence[float]) -> List[int]:
     changes = daily_changes(counts)
     mean = statistics.mean(changes)
     return [i for i, change in enumerate(changes) if change < mean]
+
+
+def daily_percent_changes(counts: Sequence[float]) -> List[float]:
+    """Return the day-over-day percentage change for each pair of values.
+
+    ``[100, 110, 99]`` gives ``[10.0, -10.0]``. Unlike :func:`daily_changes`,
+    the result is comparable across small and large channels.
+
+    Raises:
+        ValueError: if fewer than two values are given or any value other
+            than the last is not positive.
+    """
+    if len(counts) < 2:
+        raise ValueError("need at least two daily values")
+    if any(value <= 0 for value in counts[:-1]):
+        raise ValueError("values used as a baseline must be positive")
+    return [round((later - earlier) / earlier * 100, 2) for earlier, later in zip(counts, counts[1:])]
