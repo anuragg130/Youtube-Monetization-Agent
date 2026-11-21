@@ -156,6 +156,22 @@ print(milestone_days([90, 120, 480, 510]))  # {100: 1, 500: 3}
 With a daily export, `ytagent.frame.top_days(df, n=3)` ranks the strongest
 gain days for a quick "what worked" review.
 
+### Revenue tracking
+
+```python
+from ytagent.revenue import cumulative_revenue, payout_day, rpm_by_video
+
+print(cumulative_revenue([40, 35, 30]))  # [40.0, 75.0, 105.0]
+print(payout_day([40, 35, 30]))  # 2 (day the $100 AdSense threshold is reached)
+print(rpm_by_video([
+    {"title": "tutorial", "revenue": 90.0, "views": 30_000},
+    {"title": "vlog", "revenue": 10.0, "views": 10_000},
+]))  # {'tutorial': 3.0, 'vlog': 1.0, '__overall__': 2.5}
+```
+
+If an export skips days, run it through `ytagent.frame.fill_missing_dates(df)`
+first so daily-gain helpers see one row per calendar day.
+
 ## Command line
 
 ```bash
