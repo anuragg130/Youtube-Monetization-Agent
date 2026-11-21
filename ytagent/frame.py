@@ -195,3 +195,26 @@ def average_gain_by_weekday(df: pd.DataFrame, column: str = "new_subscribers") -
     order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     means = gains.groupby(gains["date"].dt.day_name())[column].mean()
     return means.reindex([day for day in order if day in means.index])
+
+
+def top_days(df: pd.DataFrame, column: str = "new_subscribers", n: int = 5) -> pd.DataFrame:
+    """Return the ``n`` days with the largest gains in ``column``.
+
+    Extends :func:`best_day` to a ranked list: the result has ``date`` and
+    ``column`` columns, sorted by gain descending with ties broken by the
+    earlier date. The first row of the export is skipped because it has no
+    prior day to compare against.
+
+    Raises:
+        ValueError: if ``column`` is unsupported, ``n`` < 1, a required
+            column is missing, or there are fewer than two rows.
+    """
+    if column not in ("new_subscribers", "new_watch_hours"):
+        raise ValueError("column must be 'new_subscribers' or 'new_watch_hours'")
+    if n < 1:
+        raise ValueError("n must be at least 1")
+    if len(df) < 2:
+        raise ValueError("need at least two rows")
+    gains = add_daily_gains(df).iloc[1:]
+    ranked = gains.sort_values([column, "date"], ascending=[False, True], kind="mergesort")
+    return ranked[["date", column]].head(n).reset_index(drop=True)
