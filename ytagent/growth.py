@@ -413,3 +413,27 @@ def recent_average_growth(counts: Sequence[float], days: int = 7) -> float:
         raise ValueError("days must be positive")
     changes = daily_changes(counts)
     return round(statistics.mean(changes[-days:]), 2)
+
+
+def growth_momentum(counts: Sequence[float], days: int = 7) -> float:
+    """Compare the average gain of the last ``days`` changes with the ``days`` before.
+
+    Returns the percent change between the two windows' mean daily gains:
+    ``25.0`` means the channel is growing a quarter faster than in the
+    previous window, a negative value means it has slowed. Extends
+    :func:`recent_average_growth` with a built-in point of comparison.
+
+    Raises:
+        ValueError: if ``days`` is not positive, there are fewer than
+            ``2 * days`` daily changes, or the earlier window's mean is not positive.
+    """
+    if days <= 0:
+        raise ValueError("days must be positive")
+    changes = daily_changes(counts)
+    if len(changes) < 2 * days:
+        raise ValueError("need at least two full windows of daily changes")
+    recent = statistics.mean(changes[-days:])
+    previous = statistics.mean(changes[-2 * days:-days])
+    if previous <= 0:
+        raise ValueError("previous window must have a positive average gain")
+    return round((recent - previous) / previous * 100, 2)
