@@ -186,6 +186,18 @@ print(recent_average_growth([100, 110, 120, 125, 128], days=2))  # 4
 print(projected_period_revenue(320, days_elapsed=21))  # 457.14
 ```
 
+`best_revenue_day` finds the top-earning day of an export,
+`growth_momentum` compares the latest growth window with the one before, and
+`days_meeting_target` lists the days a daily subscriber goal was hit:
+
+```python
+from ytagent.growth import growth_momentum
+from ytagent.revenue import best_revenue_day
+
+print(best_revenue_day([4.0, 9.25, 3.5]))  # (1, 9.25)
+print(growth_momentum([100, 110, 120, 135, 150], days=2))  # 50.0
+```
+
 ## Command line
 
 ```bash
