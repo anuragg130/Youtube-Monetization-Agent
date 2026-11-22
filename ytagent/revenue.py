@@ -344,3 +344,20 @@ def best_revenue_day(daily_revenues: Sequence[float]) -> Tuple[int, float]:
         raise ValueError("daily revenues must be non-negative")
     best = max(range(len(daily_revenues)), key=lambda day: (daily_revenues[day], -day))
     return best, float(daily_revenues[best])
+
+
+def worst_revenue_day(daily_revenues: Sequence[float]) -> Tuple[int, float]:
+    """Return the 0-based index and amount of the lowest-earning day.
+
+    The counterpart to :func:`best_revenue_day`; ties go to the earliest day,
+    so ``[5.0, 1.5, 1.5]`` gives ``(1, 1.5)``.
+
+    Raises:
+        ValueError: if ``daily_revenues`` is empty or any amount is negative.
+    """
+    if not daily_revenues:
+        raise ValueError("daily_revenues must not be empty")
+    if any(amount < 0 for amount in daily_revenues):
+        raise ValueError("daily revenues must be non-negative")
+    worst = min(range(len(daily_revenues)), key=lambda day: (daily_revenues[day], day))
+    return worst, float(daily_revenues[worst])
