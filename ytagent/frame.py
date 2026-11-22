@@ -260,3 +260,24 @@ def fill_missing_dates(df: pd.DataFrame) -> pd.DataFrame:
     # reindexing introduces NaN, which upcasts int columns; restore them
     filled = filled.astype(ordered.dtypes.to_dict())
     return filled.rename_axis("date").reset_index()
+
+
+def days_meeting_target(df: pd.DataFrame, target: float, column: str = "new_subscribers") -> pd.DataFrame:
+    """Return the days whose daily gain in ``column`` reached ``target``.
+
+    Gains come from :func:`add_daily_gains`, so the first row (which has no
+    prior day) is never counted. The result keeps ``date`` and ``column`` in
+    date order; ``len()`` of it is the number of days the goal was hit.
+
+    Raises:
+        ValueError: if a required column is missing, ``column`` is not a
+            gain column, or ``target`` is negative.
+    """
+    if target < 0:
+        raise ValueError("target must be non-negative")
+    gains = add_daily_gains(df)
+    if column not in ("new_subscribers", "new_watch_hours"):
+        raise ValueError(f"unknown gain column: {column}")
+    hits = gains.iloc[1:]
+    hits = hits[hits[column] >= target]
+    return hits[["date", column]].reset_index(drop=True)
