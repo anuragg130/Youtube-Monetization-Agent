@@ -281,3 +281,20 @@ def days_meeting_target(df: pd.DataFrame, target: float, column: str = "new_subs
     hits = gains.iloc[1:]
     hits = hits[hits[column] >= target]
     return hits[["date", column]].reset_index(drop=True)
+
+
+def target_hit_rate(df: pd.DataFrame, target: float, column: str = "new_subscribers") -> float:
+    """Return the percentage of days whose gain in ``column`` reached ``target``.
+
+    Uses :func:`days_meeting_target` for the hits and counts every day after
+    the first (which has no prior day) as an opportunity, so 2 hits over 3
+    comparable days gives ``66.67``.
+
+    Raises:
+        ValueError: as for :func:`days_meeting_target`, or if there are fewer
+            than two rows.
+    """
+    if len(df) < 2:
+        raise ValueError("need at least two rows")
+    hits = days_meeting_target(df, target, column=column)
+    return round(len(hits) / (len(df) - 1) * 100, 2)
