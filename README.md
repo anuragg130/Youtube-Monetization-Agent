@@ -172,6 +172,20 @@ print(rpm_by_video([
 If an export skips days, run it through `ytagent.frame.fill_missing_dates(df)`
 first so daily-gain helpers see one row per calendar day.
 
+### Pace checks
+
+`recent_average_growth` looks only at the last few daily changes,
+`projected_period_revenue` extrapolates month-end earnings from the pace so
+far, and `monthly_change_percent` compares each month's gains with the last:
+
+```python
+from ytagent.growth import recent_average_growth
+from ytagent.revenue import projected_period_revenue
+
+print(recent_average_growth([100, 110, 120, 125, 128], days=2))  # 4
+print(projected_period_revenue(320, days_elapsed=21))  # 457.14
+```
+
 ## Command line
 
 ```bash
