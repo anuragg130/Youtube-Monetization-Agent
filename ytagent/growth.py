@@ -1,6 +1,7 @@
 """Derive growth rates from historical channel metric snapshots."""
+import math
 import statistics
-from typing import List, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 
 def daily_changes(counts: Sequence[float]) -> List[float]:
@@ -437,3 +438,23 @@ def growth_momentum(counts: Sequence[float], days: int = 7) -> float:
     if previous <= 0:
         raise ValueError("previous window must have a positive average gain")
     return round((recent - previous) / previous * 100, 2)
+
+
+def doubling_time_days(counts: Sequence[float]) -> Optional[float]:
+    """Return how many days the channel takes to double at its compounded pace.
+
+    Uses the same compounded rate as :func:`compound_daily_growth_rate` but
+    without rounding, so ``[1000, 1100, 1210]`` (10% a day) gives ``7.27``.
+    Returns ``None`` when the series did not grow, since it will never double.
+
+    Raises:
+        ValueError: if fewer than two values are given or any value is not positive.
+    """
+    if len(counts) < 2:
+        raise ValueError("need at least two daily values")
+    if min(counts) <= 0:
+        raise ValueError("all values must be positive")
+    if counts[-1] <= counts[0]:
+        return None
+    daily_factor = (counts[-1] / counts[0]) ** (1 / (len(counts) - 1))
+    return round(math.log(2) / math.log(daily_factor), 2)
