@@ -1,7 +1,7 @@
 """Estimate ad revenue from view counts and RPM (revenue per mille)."""
 import math
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Dict, List, Mapping, Optional, Sequence
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 
 def estimate_revenue(monetized_views: int, rpm: float) -> float:
@@ -326,3 +326,21 @@ def projected_period_revenue(earned_so_far: float, days_elapsed: int, days_in_pe
     if days_elapsed > days_in_period:
         raise ValueError("days_elapsed cannot exceed days_in_period")
     return round(earned_so_far / days_elapsed * days_in_period, 2)
+
+
+def best_revenue_day(daily_revenues: Sequence[float]) -> Tuple[int, float]:
+    """Return the 0-based index and amount of the highest-earning day.
+
+    Ties go to the earliest day, so ``[12.0, 30.5, 30.5]`` gives
+    ``(1, 30.5)``. Pair it with :func:`cumulative_revenue` to see how much a
+    single viral day contributed to the period total.
+
+    Raises:
+        ValueError: if ``daily_revenues`` is empty or any amount is negative.
+    """
+    if not daily_revenues:
+        raise ValueError("daily_revenues must not be empty")
+    if any(amount < 0 for amount in daily_revenues):
+        raise ValueError("daily revenues must be non-negative")
+    best = max(range(len(daily_revenues)), key=lambda day: (daily_revenues[day], -day))
+    return best, float(daily_revenues[best])
