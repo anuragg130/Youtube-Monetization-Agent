@@ -306,3 +306,23 @@ def rpm_by_video(videos: Sequence[Mapping[str, float]]) -> Dict[str, float]:
         total_views += views
     rpms["__overall__"] = effective_rpm(total_revenue, total_views)
     return rpms
+
+
+def projected_period_revenue(earned_so_far: float, days_elapsed: int, days_in_period: int = 30) -> float:
+    """Extrapolate end-of-period revenue from the pace so far.
+
+    Assumes the remaining days earn at the same average rate as the elapsed
+    ones: $320 after 21 of 30 days projects ``457.14``. Compare the result
+    with a goal, or use :func:`daily_revenue_needed` to see the required pace.
+
+    Raises:
+        ValueError: if ``earned_so_far`` is negative, ``days_elapsed`` < 1,
+            or ``days_elapsed`` exceeds ``days_in_period``.
+    """
+    if earned_so_far < 0:
+        raise ValueError("earned_so_far must be non-negative")
+    if days_elapsed < 1:
+        raise ValueError("days_elapsed must be at least 1")
+    if days_elapsed > days_in_period:
+        raise ValueError("days_elapsed cannot exceed days_in_period")
+    return round(earned_so_far / days_elapsed * days_in_period, 2)
