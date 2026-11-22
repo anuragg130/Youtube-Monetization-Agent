@@ -153,6 +153,24 @@ def monthly_gains(df: pd.DataFrame) -> pd.DataFrame:
     return gains.groupby(month)[["new_subscribers", "new_watch_hours"]].sum()
 
 
+def monthly_change_percent(df: pd.DataFrame, column: str = "new_subscribers") -> pd.Series:
+    """Return the month-over-month percentage change of a :func:`monthly_gains` column.
+
+    Indexed by ``month`` like :func:`monthly_gains`; the first month is
+    dropped because it has nothing to compare against. A month following
+    one with zero gains yields ``NaN`` rather than infinity.
+
+    Raises:
+        ValueError: if a required column is missing or ``column`` is not
+            ``new_subscribers`` or ``new_watch_hours``.
+    """
+    if column not in ("new_subscribers", "new_watch_hours"):
+        raise ValueError(f"unknown column {column!r}")
+    monthly = monthly_gains(df)[column].astype(float)
+    previous = monthly.shift(1).where(lambda s: s != 0)
+    return ((monthly - previous) / previous * 100).iloc[1:].round(2)
+
+
 def add_rolling_gains(df: pd.DataFrame, window: int = 7) -> pd.DataFrame:
     """Return :func:`add_daily_gains` output with rolling-average gain columns.
 
