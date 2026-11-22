@@ -198,6 +198,18 @@ print(best_revenue_day([4.0, 9.25, 3.5]))  # (1, 9.25)
 print(growth_momentum([100, 110, 120, 135, 150], days=2))  # 50.0
 ```
 
+`worst_revenue_day` finds the weakest earning day, `doubling_time_days`
+estimates how long the channel takes to double at its compounded pace, and
+`target_hit_rate` reports how often a daily subscriber goal was met:
+
+```python
+from ytagent.growth import doubling_time_days
+from ytagent.revenue import worst_revenue_day
+
+print(worst_revenue_day([4.0, 9.25, 3.5]))  # (2, 3.5)
+print(doubling_time_days([1000, 1100, 1210]))  # 7.27
+```
+
 ## Command line
 
 ```bash
