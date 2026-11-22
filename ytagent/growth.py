@@ -397,3 +397,19 @@ def daily_percent_changes(counts: Sequence[float]) -> List[float]:
     if any(value <= 0 for value in counts[:-1]):
         raise ValueError("values used as a baseline must be positive")
     return [round((later - earlier) / earlier * 100, 2) for earlier, later in zip(counts, counts[1:])]
+
+
+def recent_average_growth(counts: Sequence[float], days: int = 7) -> float:
+    """Return the mean daily gain over only the last ``days`` changes.
+
+    The whole-history :func:`average_daily_growth` can hide a recent
+    slowdown or surge; this looks at the trailing window instead. If fewer
+    than ``days`` changes exist, all of them are used.
+
+    Raises:
+        ValueError: if ``days`` is not positive or fewer than two values are given.
+    """
+    if days <= 0:
+        raise ValueError("days must be positive")
+    changes = daily_changes(counts)
+    return round(statistics.mean(changes[-days:]), 2)
