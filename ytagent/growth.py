@@ -458,3 +458,26 @@ def doubling_time_days(counts: Sequence[float]) -> Optional[float]:
         return None
     daily_factor = (counts[-1] / counts[0]) ** (1 / (len(counts) - 1))
     return round(math.log(2) / math.log(daily_factor), 2)
+
+
+def days_to_multiple(counts: Sequence[float], multiple: float = 2.0) -> Optional[float]:
+    """Return how many days the channel takes to grow by ``multiple`` times.
+
+    Generalises :func:`doubling_time_days` to any target ratio, e.g.
+    ``multiple=10`` for "how long until ten times the audience" at the
+    compounded pace seen so far. Returns ``None`` when the series did not grow.
+
+    Raises:
+        ValueError: if ``multiple`` is not above 1, fewer than two values are
+            given, or any value is not positive.
+    """
+    if multiple <= 1:
+        raise ValueError("multiple must be greater than 1")
+    if len(counts) < 2:
+        raise ValueError("need at least two daily values")
+    if min(counts) <= 0:
+        raise ValueError("all values must be positive")
+    if counts[-1] <= counts[0]:
+        return None
+    daily_factor = (counts[-1] / counts[0]) ** (1 / (len(counts) - 1))
+    return round(math.log(multiple) / math.log(daily_factor), 2)
