@@ -361,3 +361,25 @@ def worst_revenue_day(daily_revenues: Sequence[float]) -> Tuple[int, float]:
         raise ValueError("daily revenues must be non-negative")
     worst = min(range(len(daily_revenues)), key=lambda day: (daily_revenues[day], day))
     return worst, float(daily_revenues[worst])
+
+
+def top_days_revenue_share(daily_revenues: Sequence[float], n: int = 3) -> float:
+    """Return the percentage of total revenue earned on the ``n`` best days.
+
+    A high share means earnings hinge on a few spikes rather than steady
+    income: ``[10.0, 10.0, 80.0]`` with ``n=1`` gives ``80.0``. Returns 0.0
+    when total revenue is zero. ``n`` larger than the number of days simply
+    covers every day.
+
+    Raises:
+        ValueError: if ``n`` is below 1 or any amount is negative.
+    """
+    if n < 1:
+        raise ValueError("n must be at least 1")
+    if any(amount < 0 for amount in daily_revenues):
+        raise ValueError("daily revenues must be non-negative")
+    total = sum(daily_revenues)
+    if total == 0:
+        return 0.0
+    top = sum(sorted(daily_revenues, reverse=True)[:n])
+    return round(top / total * 100, 2)
