@@ -383,3 +383,25 @@ def top_days_revenue_share(daily_revenues: Sequence[float], n: int = 3) -> float
         return 0.0
     top = sum(sorted(daily_revenues, reverse=True)[:n])
     return round(top / total * 100, 2)
+
+
+def longest_earning_streak(daily_revenues: Sequence[float], threshold: float = 0.01) -> int:
+    """Return the longest run of consecutive days earning at least ``threshold``.
+
+    Measures how consistently a channel earns rather than how much: with the
+    default one-cent threshold, ``[3.0, 0.0, 2.0, 4.5, 1.0]`` gives ``3``.
+    Raise ``threshold`` to ask, for example, how many days in a row the
+    channel cleared $10. An empty sequence gives ``0``.
+
+    Raises:
+        ValueError: if ``threshold`` is negative or any amount is negative.
+    """
+    if threshold < 0:
+        raise ValueError("threshold must be non-negative")
+    longest = current = 0
+    for amount in daily_revenues:
+        if amount < 0:
+            raise ValueError("daily revenues must be non-negative")
+        current = current + 1 if amount >= threshold else 0
+        longest = max(longest, current)
+    return longest
