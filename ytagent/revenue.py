@@ -1,5 +1,6 @@
 """Estimate ad revenue from view counts and RPM (revenue per mille)."""
 import math
+import statistics
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
@@ -430,3 +431,26 @@ def trailing_revenue_totals(daily_revenues: Sequence[float], window: int = 28) -
     for day in range(window, len(values)):
         totals.append(totals[-1] + values[day] - values[day - window])
     return [round(total, 2) for total in totals]
+
+
+def revenue_volatility(daily_revenues: Sequence[float]) -> float:
+    """Return the coefficient of variation of daily revenue, as a percentage.
+
+    Divides the sample standard deviation by the mean so channels of any size
+    can be compared: ``10.0`` means a typical day lands within about 10% of
+    the average, while values above ``100.0`` signal income dominated by a few
+    spikes. Fewer than two days, or a series with no revenue at all, gives
+    ``0.0``.
+
+    Raises:
+        ValueError: if any amount is negative.
+    """
+    if any(amount < 0 for amount in daily_revenues):
+        raise ValueError("daily revenues must be non-negative")
+    values = [float(amount) for amount in daily_revenues]
+    if len(values) < 2:
+        return 0.0
+    mean = statistics.mean(values)
+    if mean == 0:
+        return 0.0
+    return round(statistics.stdev(values) / mean * 100, 2)
