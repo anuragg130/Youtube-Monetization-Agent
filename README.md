@@ -210,6 +210,31 @@ print(worst_revenue_day([4.0, 9.25, 3.5]))  # (2, 3.5)
 print(doubling_time_days([1000, 1100, 1210]))  # 7.27
 ```
 
+### Earnings consistency
+
+`days_to_multiple` generalises doubling time to any growth ratio,
+`top_days_revenue_share` shows how much income comes from the best days,
+`longest_earning_streak` counts consecutive earning days,
+`trailing_revenue_totals` gives the rolling "last N days" figure for every
+day, and `revenue_volatility` reports the day-to-day spread of earnings as a
+percentage of the average:
+
+```python
+from ytagent.growth import days_to_multiple
+from ytagent.revenue import (
+    longest_earning_streak,
+    revenue_volatility,
+    top_days_revenue_share,
+    trailing_revenue_totals,
+)
+
+print(days_to_multiple([1000, 1100, 1210], 3))  # 11.53
+print(top_days_revenue_share([4.0, 9.25, 3.5, 3.25], 1))  # 46.25
+print(longest_earning_streak([3.0, 0.0, 2.0, 4.5, 1.0]))  # 3
+print(trailing_revenue_totals([1.0, 2.0, 3.0, 4.0], window=2))  # [3.0, 5.0, 7.0]
+print(revenue_volatility([8.0, 10.0, 12.0]))  # 20.0
+```
+
 ## Command line
 
 ```bash
