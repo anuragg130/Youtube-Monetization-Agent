@@ -405,3 +405,28 @@ def longest_earning_streak(daily_revenues: Sequence[float], threshold: float = 0
         current = current + 1 if amount >= threshold else 0
         longest = max(longest, current)
     return longest
+
+
+def trailing_revenue_totals(daily_revenues: Sequence[float], window: int = 28) -> List[float]:
+    """Return the revenue earned over each trailing ``window``-day period.
+
+    Mirrors the "last 28 days" figure YouTube Studio reports, but for every
+    day in the series, so you can see how that headline number moved over
+    time. The result has one value per full window, in day order:
+    ``[1.0, 2.0, 3.0, 4.0]`` with ``window=2`` gives ``[3.0, 5.0, 7.0]``.
+    A series shorter than ``window`` gives an empty list.
+
+    Raises:
+        ValueError: if ``window`` is below 1 or any amount is negative.
+    """
+    if window < 1:
+        raise ValueError("window must be at least 1")
+    if any(amount < 0 for amount in daily_revenues):
+        raise ValueError("daily revenues must be non-negative")
+    values = [float(amount) for amount in daily_revenues]
+    if len(values) < window:
+        return []
+    totals = [sum(values[:window])]
+    for day in range(window, len(values)):
+        totals.append(totals[-1] + values[day] - values[day - window])
+    return [round(total, 2) for total in totals]
