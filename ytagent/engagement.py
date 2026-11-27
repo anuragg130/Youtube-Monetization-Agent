@@ -267,3 +267,24 @@ def interaction_mix(likes: int, comments: int, shares: int) -> Dict[str, float]:
     if total == 0:
         return {key: 0.0 for key in counts}
     return {key: round(value / total * 100, 2) for key, value in counts.items()}
+
+
+def engagement_rates_by_video(videos: Iterable[Mapping[str, object]]) -> Dict[str, float]:
+    """Return a ``{title: engagement_rate}`` mapping for every video.
+
+    The engagement counterpart of :func:`ytagent.revenue.rpm_by_video`.
+    Each item needs ``title``, ``likes``, ``comments`` and ``views`` keys;
+    rates come from :func:`engagement_rate`, so videos with no views map to
+    0.0. Unlike :func:`top_videos_by_engagement` nothing is ranked or cut.
+
+    Raises:
+        KeyError: if a video is missing a required key.
+        ValueError: if titles repeat or any count is negative.
+    """
+    rates: Dict[str, float] = {}
+    for video in videos:
+        title = str(video["title"])
+        if title in rates:
+            raise ValueError(f"duplicate video title: {title!r}")
+        rates[title] = engagement_rate(video["likes"], video["comments"], video["views"])
+    return rates
