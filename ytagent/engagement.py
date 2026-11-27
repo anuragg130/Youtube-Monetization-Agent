@@ -1,4 +1,5 @@
 """Audience engagement metrics derived from per-video statistics."""
+import statistics
 from typing import Dict, Iterable, List, Mapping, Tuple
 
 
@@ -288,3 +289,25 @@ def engagement_rates_by_video(videos: Iterable[Mapping[str, object]]) -> Dict[st
             raise ValueError(f"duplicate video title: {title!r}")
         rates[title] = engagement_rate(video["likes"], video["comments"], video["views"])
     return rates
+
+
+def median_engagement_rate(videos: Iterable[Mapping[str, object]]) -> float:
+    """Return the median per-video engagement rate, skipping videos with no views.
+
+    :func:`channel_engagement_rate` is view-weighted, so one viral upload can
+    dominate it; the median shows how a typical video performs instead.
+    Rates come from :func:`engagement_rate`. Returns 0.0 when no video has
+    any views.
+
+    Raises:
+        KeyError: if a video is missing a required key.
+        ValueError: if any count is negative.
+    """
+    rates = [
+        engagement_rate(video["likes"], video["comments"], video["views"])
+        for video in videos
+        if video["views"] > 0
+    ]
+    if not rates:
+        return 0.0
+    return round(statistics.median(rates), 2)
