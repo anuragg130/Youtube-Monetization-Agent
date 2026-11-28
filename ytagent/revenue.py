@@ -454,3 +454,24 @@ def revenue_volatility(daily_revenues: Sequence[float]) -> float:
     if mean == 0:
         return 0.0
     return round(statistics.stdev(values) / mean * 100, 2)
+
+
+def median_daily_revenue(daily_revenues: Sequence[float], skip_zero_days: bool = False) -> float:
+    """Return the median revenue per day, rounded to cents.
+
+    The median describes a typical day better than the mean when one viral
+    video or a sponsorship payout inflates a few days: ``[1.0, 1.5, 2.0,
+    40.0]`` gives ``1.75`` where the mean is ``11.12``. Set
+    ``skip_zero_days`` to ignore days with no earnings, e.g. before
+    monetization was switched on. An empty series (after skipping) gives
+    ``0.0``.
+
+    Raises:
+        ValueError: if any amount is negative.
+    """
+    if any(amount < 0 for amount in daily_revenues):
+        raise ValueError("daily revenues must be non-negative")
+    values = [float(amount) for amount in daily_revenues if not (skip_zero_days and amount == 0)]
+    if not values:
+        return 0.0
+    return round(statistics.median(values), 2)
