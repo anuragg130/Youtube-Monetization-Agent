@@ -78,3 +78,25 @@ def days_to_shorts_eligibility(
             return None
         days = max(days, math.ceil(needed / rate))
     return days
+
+
+SHORTS_WINDOW_DAYS = 90
+
+
+def shorts_pace_ratio(shorts_views_90d: int) -> float:
+    """Return the channel's daily Shorts pace relative to the sustaining pace.
+
+    The 10M-view requirement is a rolling 90-day window, so staying eligible
+    means averaging about 111,112 Shorts views a day. A ratio of ``1.0`` is
+    exactly that pace, ``0.5`` is half of it, and anything at or above
+    ``1.0`` keeps the window full as old views age out. Rounded to two
+    decimals.
+
+    Raises:
+        ValueError: if ``shorts_views_90d`` is negative.
+    """
+    if shorts_views_90d < 0:
+        raise ValueError("shorts views must be non-negative")
+    needed_per_day = math.ceil(SHORTS_VIEWS_THRESHOLD / SHORTS_WINDOW_DAYS)
+    current_per_day = shorts_views_90d / SHORTS_WINDOW_DAYS
+    return round(current_per_day / needed_per_day, 2)
