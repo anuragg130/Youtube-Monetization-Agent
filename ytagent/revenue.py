@@ -475,3 +475,21 @@ def median_daily_revenue(daily_revenues: Sequence[float], skip_zero_days: bool =
     if not values:
         return 0.0
     return round(statistics.median(values), 2)
+
+
+def earning_day_share(daily_revenues: Sequence[float]) -> float:
+    """Return the percentage of days that earned any revenue.
+
+    A channel that only earns on upload days shows a low share even when its
+    totals look healthy, which flags lumpy income: ``[0.0, 2.0, 0.0, 3.0]``
+    gives ``50.0``. An empty series gives ``0.0``.
+
+    Raises:
+        ValueError: if any amount is negative.
+    """
+    if any(amount < 0 for amount in daily_revenues):
+        raise ValueError("daily revenues must be non-negative")
+    if not daily_revenues:
+        return 0.0
+    earning = sum(1 for amount in daily_revenues if amount > 0)
+    return round(earning / len(daily_revenues) * 100, 1)
