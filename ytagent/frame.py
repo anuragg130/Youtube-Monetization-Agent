@@ -298,3 +298,26 @@ def target_hit_rate(df: pd.DataFrame, target: float, column: str = "new_subscrib
         raise ValueError("need at least two rows")
     hits = days_meeting_target(df, target, column=column)
     return round(len(hits) / (len(df) - 1) * 100, 2)
+
+
+def bottom_days(df: pd.DataFrame, column: str = "new_subscribers", n: int = 5) -> pd.DataFrame:
+    """Return the ``n`` days with the smallest gains in ``column``.
+
+    The counterpart to :func:`top_days`, useful for spotting the slow or
+    losing days worth investigating. The result has ``date`` and ``column``
+    columns, sorted by gain ascending with ties broken by the earlier date.
+    The first row of the export is skipped because it has no prior day.
+
+    Raises:
+        ValueError: if ``column`` is unsupported, ``n`` < 1, a required
+            column is missing, or there are fewer than two rows.
+    """
+    if column not in ("new_subscribers", "new_watch_hours"):
+        raise ValueError("column must be 'new_subscribers' or 'new_watch_hours'")
+    if n < 1:
+        raise ValueError("n must be at least 1")
+    if len(df) < 2:
+        raise ValueError("need at least two rows")
+    gains = add_daily_gains(df).iloc[1:]
+    ranked = gains.sort_values([column, "date"], ascending=[True, True], kind="mergesort")
+    return ranked[["date", column]].head(n).reset_index(drop=True)
