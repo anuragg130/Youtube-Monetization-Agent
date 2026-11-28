@@ -481,3 +481,20 @@ def days_to_multiple(counts: Sequence[float], multiple: float = 2.0) -> Optional
         return None
     daily_factor = (counts[-1] / counts[0]) ** (1 / (len(counts) - 1))
     return round(math.log(multiple) / math.log(daily_factor), 2)
+
+
+def longest_flat_streak(counts: Sequence[float]) -> int:
+    """Return the longest run of consecutive days where the total did not move.
+
+    Complements :func:`flat_days` by measuring how long the channel stalled:
+    ``[500, 500, 500, 510, 510, 505]`` gives ``2``. A multi-day streak is a
+    strong hint that analytics stopped updating or uploads paused.
+
+    Raises:
+        ValueError: if fewer than two values are given.
+    """
+    best = current = 0
+    for change in daily_changes(counts):
+        current = current + 1 if change == 0 else 0
+        best = max(best, current)
+    return best
